@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.PaperTrail" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/design_default_color_surface</item>
+        <item name="colorPrimary">@color/design_default_color_primary</item>
         <item name="colorPrimaryVariant">@color/design_default_color_primary_variant</item>
         <item name="colorOnPrimary">@color/design_default_color_on_primary</item>
         <!-- Secondary brand color. -->
