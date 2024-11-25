@@ -4,6 +4,9 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.group2.papertrail.dao.CategoryDAO;
+import com.group2.papertrail.dao.PDFDAO;
+
 public class DatabaseManager extends SQLiteOpenHelper {
     private static final String DB_NAME = "papertrail.db";
     private static final int DB_VERSION = 1;
@@ -23,12 +26,15 @@ public class DatabaseManager extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(CategoryDAO.CREATE_TABLE);
+        db.execSQL(PDFDAO.CREATE_TABLE);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
+        db.execSQL("DROP TABLE IF EXISTS " + PDFDAO.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CategoryDAO.TABLE_NAME);
+        onCreate(db);
     }
 }
