@@ -19,7 +19,7 @@ import com.group2.papertrail.ui.library.LibraryViewModel;
 
 public class TabFragment extends Fragment {
 
-    private TabViewModel mViewModel;
+    private TabViewModel tabViewModel;
     private FragmentTabBinding binding;
 
     public static TabFragment newInstance(String tabName) {
@@ -33,16 +33,13 @@ public class TabFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentTabBinding.inflate(inflater, container, false);
+        tabViewModel = new ViewModelProvider(this).get(TabViewModel.class);
 
+        tabViewModel.setTabName(getArguments().getString("tabName"));
+
+        binding.placeholderTxt.setText(tabViewModel.getTabName().getValue());
 
         return binding.getRoot();
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(TabViewModel.class);
-        // TODO: Use the ViewModel
     }
 
 }
