@@ -4,16 +4,36 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LibraryViewModel extends ViewModel {
 
-    private final MutableLiveData<String> mText;
+    private final MutableLiveData<List<String>> tabNames;
 
     public LibraryViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is dashboard fragment");
+        // Retrieve categories from sqlite
+        this.tabNames = new MutableLiveData<>(new ArrayList<String>());
+        tabNames.setValue(new ArrayList<>());
+
+        addTabNames("School");
+        addTabNames("Work");
+        addTabNames("Personal");
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public void addTabNames(String tabName) {
+        List<String> tabList = tabNames.getValue();
+        if (tabList == null) {
+            tabList = new ArrayList<String>();
+        } else {
+            tabList = new ArrayList<>(tabList);
+        }
+
+        tabList.add(tabName);
+        tabNames.setValue(tabList);
+    }
+
+    public LiveData<List<String>> getTabNames() {
+        return tabNames;
     }
 }

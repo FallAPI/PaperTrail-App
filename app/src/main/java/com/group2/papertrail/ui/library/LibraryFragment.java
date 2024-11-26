@@ -27,10 +27,7 @@ public class LibraryFragment extends Fragment {
         binding = FragmentLibraryBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        List<String> tabNames = new ArrayList<>();
-        tabNames.add("School");
-        tabNames.add("Work");
-        tabNames.add("Personal");
+        List<String> tabNames = libraryViewModel.getTabNames().getValue();
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(this, tabNames);
         binding.viewPager.setAdapter(adapter);
@@ -38,6 +35,8 @@ public class LibraryFragment extends Fragment {
         new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
             tab.setText(tabNames.get(position));
         }).attach();
+
+
 
         return root;
     }
