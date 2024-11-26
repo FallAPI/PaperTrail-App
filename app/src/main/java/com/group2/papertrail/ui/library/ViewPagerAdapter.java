@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.group2.papertrail.ui.library.tab.AddCategoryFragment;
 import com.group2.papertrail.ui.library.tab.TabFragment;
 
 import java.util.List;
@@ -21,11 +22,17 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        return TabFragment.newInstance(tabNames.get(position));
+        if (position == tabNames.size() - 1) {
+            return AddCategoryFragment.newInstance();
+        } else {
+            return TabFragment.newInstance(tabNames.get(position));
+        }
     }
 
     @Override
     public int getItemCount() {
         return tabNames.size();
     }
+
+
 }

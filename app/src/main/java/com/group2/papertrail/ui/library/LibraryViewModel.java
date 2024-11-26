@@ -19,6 +19,7 @@ public class LibraryViewModel extends ViewModel {
         addTabNames("School");
         addTabNames("Work");
         addTabNames("Personal");
+        addTabNames("Add"); // Add new category placeholder DO NOT REMOVE
     }
 
     public void addTabNames(String tabName) {
