@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.group2.papertrail.R;
 import com.group2.papertrail.databinding.FragmentLibraryBinding;
 import com.group2.papertrail.databinding.FragmentTabBinding;
+import com.group2.papertrail.model.Category;
 import com.group2.papertrail.ui.library.LibraryViewModel;
 
 public class TabFragment extends Fragment {
@@ -22,10 +23,11 @@ public class TabFragment extends Fragment {
     private TabViewModel tabViewModel;
     private FragmentTabBinding binding;
 
-    public static TabFragment newInstance(String tabName) {
+    public static TabFragment newInstance(Category category) {
         TabFragment fragment = new TabFragment();
         Bundle args = new Bundle();
-        args.putString("tabName", tabName);
+        args.putLong("tabId", category.getId());
+        args.putString("tabName", category.getName());
         fragment.setArguments(args);
         return fragment;
     }

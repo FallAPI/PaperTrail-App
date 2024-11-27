@@ -19,15 +19,25 @@
         android:paddingHorizontal="15dp"
         android:layout_marginTop="?attr/actionBarSize">
 
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            app:layout_constraintTop_toTopOf="@id/childConstraint"
+            app:layout_constraintStart_toStartOf="@id/childConstraint"
+            app:layout_constraintEnd_toEndOf="@id/childConstraint"
+            android:visibility="invisible"
+            android:indeterminate="true" />
+
         <TextView
             android:id="@+id/categoryTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15sp"
-            android:layout_marginTop="35dp"
             android:text="Category name"
             android:labelFor="@id/categoryTxtLayout"
-            app:layout_constraintTop_toTopOf="@id/childConstraint"
+            app:layout_constraintTop_toBottomOf="@id/progress"
             app:layout_constraintStart_toStartOf="@id/childConstraint"/>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -38,6 +48,7 @@
             app:layout_constraintTop_toBottomOf="@id/categoryTxt"
             app:layout_constraintStart_toStartOf="@id/childConstraint"
             app:layout_constraintEnd_toEndOf="@id/childConstraint"
+            app:errorEnabled="true"
             android:hint="Category">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -55,7 +66,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginTop="15dp"
             android:text="Add"
             app:layout_constraintTop_toBottomOf="@id/categoryTxtLayout"
             app:layout_constraintEnd_toEndOf="@id/childConstraint"/>

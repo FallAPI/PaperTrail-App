@@ -19,10 +19,12 @@ import android.widget.Toast;
 import com.group2.papertrail.dao.CategoryDAO;
 import com.group2.papertrail.database.DatabaseManager;
 import com.group2.papertrail.databinding.FragmentAddCategoryBinding;
+import com.group2.papertrail.ui.library.CategoryViewModel;
 
 public class AddCategoryFragment extends Fragment {
 
     private AddCategoryViewModel addCategoryViewModel;
+    private CategoryViewModel categoryViewModel;
     private FragmentAddCategoryBinding binding;
 
     public static AddCategoryFragment newInstance() {
@@ -31,13 +33,14 @@ public class AddCategoryFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        addCategoryViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+        addCategoryViewModel = new ViewModelProvider(this).get(AddCategoryViewModel.class);
+        categoryViewModel = new ViewModelProvider(requireActivity(), new ViewModelProvider.Factory() {
             @NonNull
             @Override
             public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-                return (T) new AddCategoryViewModel(getActivity().getApplicationContext());
+                return (T) new CategoryViewModel(requireActivity().getApplication());
             }
-        }).get(AddCategoryViewModel.class);
+        }).get(CategoryViewModel.class);
 
         binding = FragmentAddCategoryBinding.inflate(inflater, container, false);
 
@@ -66,24 +69,9 @@ public class AddCategoryFragment extends Fragment {
             binding.progress.setVisibility(isLoading ? View.VISIBLE : View.INVISIBLE);
         });
 
-        // Observe add category result
-        addCategoryViewModel.getAddCategoryResult().observe(getViewLifecycleOwner(), result -> {
-            switch (result) {
-                case SUCCESS:
-                    Toast.makeText(requireContext(), "Category successfully added", Toast.LENGTH_SHORT).show();
-                    binding.categoryValue.setText(""); // Clear input
-                    break;
-                case ERROR:
-                    Toast.makeText(requireContext(), "Failed to add category", Toast.LENGTH_SHORT).show();
-                    break;
-                case EMPTY_NAME:
-                    Toast.makeText(requireContext(), "Category name cannot be empty", Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        });
-
         binding.addBtn.setOnClickListener(v -> {
-            addCategoryViewModel.addCategory(result -> {
+            String name = binding.categoryValue.getText().toString();
+            categoryViewModel.addCategory(name, result -> {
                 switch (result) {
                     case SUCCESS:
                         Toast.makeText(requireContext(), "Category successfully added", Toast.LENGTH_SHORT).show();
