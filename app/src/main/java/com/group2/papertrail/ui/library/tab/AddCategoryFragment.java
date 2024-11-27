@@ -1,5 +1,6 @@
 package com.group2.papertrail.ui.library.tab;
 
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -13,7 +14,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.group2.papertrail.dao.CategoryDAO;
+import com.group2.papertrail.database.DatabaseManager;
 import com.group2.papertrail.databinding.FragmentAddCategoryBinding;
 
 public class AddCategoryFragment extends Fragment {
@@ -27,7 +31,13 @@ public class AddCategoryFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        addCategoryViewModel = new ViewModelProvider(this).get(AddCategoryViewModel.class);
+        addCategoryViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                return (T) new AddCategoryViewModel(getActivity().getApplicationContext());
+            }
+        }).get(AddCategoryViewModel.class);
 
         binding = FragmentAddCategoryBinding.inflate(inflater, container, false);
 
@@ -44,13 +54,54 @@ public class AddCategoryFragment extends Fragment {
             public void afterTextChanged(Editable editable) {}
         });
 
-        binding.addBtn.setOnClickListener(v -> {
+        addCategoryViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading) {
+                binding.progress.setVisibility(View.VISIBLE);
+            } else {
+                binding.progress.setVisibility(View.INVISIBLE);
+            }
+        });
 
+        addCategoryViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            binding.progress.setVisibility(isLoading ? View.VISIBLE : View.INVISIBLE);
+        });
+
+        // Observe add category result
+        addCategoryViewModel.getAddCategoryResult().observe(getViewLifecycleOwner(), result -> {
+            switch (result) {
+                case SUCCESS:
+                    Toast.makeText(requireContext(), "Category successfully added", Toast.LENGTH_SHORT).show();
+                    binding.categoryValue.setText(""); // Clear input
+                    break;
+                case ERROR:
+                    Toast.makeText(requireContext(), "Failed to add category", Toast.LENGTH_SHORT).show();
+                    break;
+                case EMPTY_NAME:
+                    Toast.makeText(requireContext(), "Category name cannot be empty", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        });
+
+        binding.addBtn.setOnClickListener(v -> {
+            addCategoryViewModel.addCategory(result -> {
+                switch (result) {
+                    case SUCCESS:
+                        Toast.makeText(requireContext(), "Category successfully added", Toast.LENGTH_SHORT).show();
+                        binding.categoryValue.setText(""); // Clear input
+                        binding.categoryTxtLayout.setError(null);
+                        break;
+                    case ERROR:
+                        Toast.makeText(requireContext(), "Failed to add category", Toast.LENGTH_SHORT).show();
+                        break;
+                    case EMPTY_NAME:
+                        binding.categoryTxtLayout.setError("Category name cannot be empty");
+                        break;
+                }
+            });
         });
 
         return binding.getRoot();
     }
-
 
 
 }
