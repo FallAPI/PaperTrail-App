@@ -35,16 +35,16 @@ public class ThumbnailManager {
             var fileDescriptor = ctx.getContentResolver().openFileDescriptor(pdfURI, "r");
 
             if (fileDescriptor == null) {
-//                throw new FileNotFoundException("PDF is not found");
                 return null;
             }
 
             var pdfRenderer = new PdfRenderer(fileDescriptor);
             var page = pdfRenderer.openPage(0);
 
-            int width = 200;
+            int width = 400;
             int height = (int) (width * ((float) page.getHeight() / page.getWidth()));
             var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap.eraseColor(android.graphics.Color.WHITE);
 
             page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
             page.close();
@@ -63,7 +63,7 @@ public class ThumbnailManager {
         var uuidStr = generateUUID();
 
         var directory = ctx.getFilesDir();
-        var file = new File(directory, uuidStr);
+        var file = new File(directory, uuidStr + ".jpeg");
 
         FileOutputStream fos = null;
 
@@ -88,7 +88,7 @@ public class ThumbnailManager {
 
     public static Bitmap getPDFThumbnail(Context ctx, String thumbnailURI) {
         var directory = ctx.getFilesDir();
-        var file = new File(directory, thumbnailURI);
+        var file = new File(thumbnailURI);
 
         FileInputStream fis = null;
         Bitmap bitmap = null;
