@@ -41,6 +41,19 @@ public class PDF {
         this.createdAt = createdAt;
     }
 
+    public PDF(String fileName, String URI, String thumbnailFilePath, String title, String author, long size, int pageCount, Date createdAt, Category category) {
+        this.fileName = fileName;
+        this.URI = URI;
+        this.thumbnailFilePath = thumbnailFilePath;
+        this.title = title;
+        this.author = author;
+        this.size = size;
+        this.pageCount = pageCount;
+        this.category = category;
+        this.createdAt = createdAt;
+    }
+
+
     public long getId() {
         return id;
     }
@@ -56,6 +69,8 @@ public class PDF {
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
+
+
 
     public String getDescription() {
         return description;
