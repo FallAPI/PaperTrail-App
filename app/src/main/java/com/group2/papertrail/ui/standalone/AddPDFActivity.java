@@ -29,6 +29,8 @@ public class AddPDFActivity extends AppCompatActivity {
     private PDFViewModel pdfViewModel;
     private FilePicker filePicker;
 
+    // TODO: Add progress linear button when adding pdf
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +76,17 @@ public class AddPDFActivity extends AppCompatActivity {
             this.addPDFActivityViewModel.selectCategoryById(i+1);
         });
 
+        this.addPDFActivityViewModel.getIsLoading().observe(this, isLoading -> {
+            if(isLoading) {
+                binding.addPdfProgress.setVisibility(View.VISIBLE);
+            } else {
+                binding.addPdfProgress.setVisibility(View.INVISIBLE);
+            }
+        });
+
         binding.addBtn.setOnClickListener(view -> {
+            this.addPDFActivityViewModel.setIsLoading(true);
+            toggleInput(false); // disable input
             this.pdfViewModel.addPDF(
                     this.addPDFActivityViewModel.getFileMetadata().getValue(),
                     this.addPDFActivityViewModel.getSelectedCategory().getValue(),
@@ -91,6 +103,8 @@ public class AddPDFActivity extends AppCompatActivity {
                                 binding.menu.setError("Category is required");
                                 break;
                         }
+                        this.addPDFActivityViewModel.setIsLoading(false);
+                        toggleInput(true); // re-enable input
                     }
             );
         });
@@ -110,5 +124,12 @@ public class AddPDFActivity extends AppCompatActivity {
         binding.fileName.setText(metadata.getFileName());
         binding.fileName.setVisibility(View.VISIBLE);
 
+    }
+
+    private void toggleInput(boolean state) {
+        binding.addBtn.setEnabled(state);
+        binding.selectFileBtn.setEnabled(state);
+        binding.menu.setEnabled(state);
+        binding.dropdownMenu.setEnabled(state);
     }
 }
