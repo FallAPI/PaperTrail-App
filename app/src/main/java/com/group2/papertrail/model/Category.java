@@ -1,5 +1,7 @@
 package com.group2.papertrail.model;
 
+import androidx.annotation.NonNull;
+
 public class Category {
     private long id;
     private String name;
@@ -27,5 +29,11 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return this.name;
     }
 }

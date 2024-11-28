@@ -15,9 +15,10 @@ public class FilePicker {
     }
 
     public void openFilePicker() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType("application/pdf");  // Allow all file types
         intent.addCategory(Intent.CATEGORY_OPENABLE);
+
         activity.startActivityForResult(intent, FILE_PICK_REQUEST_CODE);
     }
 
@@ -66,6 +67,9 @@ public class FilePicker {
         if (requestCode == FILE_PICK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             if (data != null && data.getData() != null) {
                 Uri selectedFileUri = data.getData();
+
+                activity.getContentResolver().takePersistableUriPermission(selectedFileUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
                 FileMetadata metadata = getFileMetadata(selectedFileUri);
 
                 return metadata;
