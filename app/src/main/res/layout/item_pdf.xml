@@ -9,16 +9,35 @@
 
     <LinearLayout
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:orientation="vertical"
         android:padding="8dp">
 
-        <ImageView
-            android:id="@+id/item_image"
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_description"/>
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/item_progress_circular"
+                android:layout_gravity="center"
+                style="@style/Widget.Material3.CircularProgressIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true" />
+
+            <ImageView
+                android:id="@+id/item_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@drawable/rounded_image"
+                android:clipToOutline="true"
+                android:src="@drawable/ic_description"/>
+
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
