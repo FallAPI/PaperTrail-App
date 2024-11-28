@@ -23,11 +23,13 @@ public class AddPDFActivityViewModel extends ViewModel {
     private CategoryDAO categoryDAO;
     private MutableLiveData<List<Category>> categories;
     private MutableLiveData<Category> selectedCategory;
+    private MutableLiveData<Boolean> isLoading;
     public AddPDFActivityViewModel(Application app) {
         this.fileMetadata = new MutableLiveData<>();
         this.categoryDAO = new CategoryDAO(app.getApplicationContext());
         this.selectedCategory = new MutableLiveData<>();
         this.categories = new MutableLiveData<>(new ArrayList<>());
+        this.isLoading = new MutableLiveData<>(false);
         loadCategories();
     }
 
@@ -75,5 +77,13 @@ public class AddPDFActivityViewModel extends ViewModel {
                 Log.e("CATEGORY_VM", "Error selecting category", e);
             }
         });
+    }
+
+    public MutableLiveData<Boolean> getIsLoading() {
+        return isLoading;
+    }
+
+    public void setIsLoading(boolean state) {
+        this.isLoading.setValue(state);
     }
 }

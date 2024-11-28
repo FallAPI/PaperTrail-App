@@ -54,11 +54,11 @@ public class PDFViewModel extends ViewModel {
         this.isLoading.setValue(state);
     }
 
-    public void loadPDF(Callback<PDFOperationResult> callback) {
+    public void loadPDF(long categoryId, Callback<PDFOperationResult> callback) {
         setIsLoading(true);
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
-                List<PDF> pdfs = pdfDAO.findAll();
+                List<PDF> pdfs = pdfDAO.findAllByCategoryId(categoryId);
                 new Handler(Looper.getMainLooper()).post(() -> {
                     pdfFiles.setValue(pdfs);
                     setIsLoading(false);
@@ -77,8 +77,6 @@ public class PDFViewModel extends ViewModel {
     public void addPDF(FilePicker.FileMetadata metadata, Category category, Callback<PDFOperationResult> callback) {
         if (metadata == null || category == null) {
             callback.onResult(PDFOperationResult.EMPTY_FILE);
-            Log.d("CATEGORY", category.toString());
-            Log.d("METADATA", metadata.getFileName());
             return;
         }
 
@@ -94,7 +92,7 @@ public class PDFViewModel extends ViewModel {
                 pdfDAO.insert(newPdf);
                 new Handler(Looper.getMainLooper()).post(() -> {
                     setIsLoading(false);
-                    loadPDF(result -> {
+                    loadPDF(category.getId(), result -> {
                         callback.onResult(PDFOperationResult.SUCCESS);
                     });
                 });

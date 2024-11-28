@@ -22,7 +22,7 @@ public class PaperRecylerViewAdapter extends RecyclerView.Adapter<PaperRecylerVi
     @NonNull
     @Override
     public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recently_viewed, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_pdf, parent, false);
         return new viewHolder(view);
     }
 
