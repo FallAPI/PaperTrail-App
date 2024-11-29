@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.group2.papertrail.R;
 import com.group2.papertrail.util.ThumbnailManager;
+import com.rajat.pdfviewer.PdfViewerActivity;
+import com.rajat.pdfviewer.util.saveTo;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -77,6 +80,19 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
             holder.thumbnailImageView.setVisibility(View.VISIBLE);
             holder.thumbnailImageView.setImageResource(R.drawable.ic_description);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            Log.d("LAUNCH_PDF", "ItemView clicked");
+            var pdfIntent = PdfViewerActivity.Companion.launchPdfFromPath(
+                    holder.itemView.getContext(),
+                    item.getPdf().getURI(),
+                    !item.getPdf().getTitle().isEmpty() ? item.getPdf().getTitle() : item.getPdf().getFileName(),
+                    saveTo.ASK_EVERYTIME,
+                    false
+            );
+
+            holder.itemView.getContext().startActivity(pdfIntent);
+        });
     }
 
     @Override
