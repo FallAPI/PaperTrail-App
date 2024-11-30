@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.group2.papertrail.dao.CategoryDAO;
 import com.group2.papertrail.dao.PDFDAO;
+import com.group2.papertrail.dao.UserDAO;
 import com.group2.papertrail.util.ThumbnailManager;
 
 import java.util.concurrent.ExecutorService;
@@ -39,12 +40,14 @@ public class DatabaseManager extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CategoryDAO.CREATE_TABLE);
         db.execSQL(PDFDAO.CREATE_TABLE);
+        db.execSQL(UserDAO.CREATE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE IF EXISTS " + PDFDAO.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + CategoryDAO.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + UserDAO.TABLE_NAME);
         onCreate(db);
     }
 
@@ -58,6 +61,7 @@ public class DatabaseManager extends SQLiteOpenHelper {
                 // Drop all tables
                 db.execSQL("DROP TABLE IF EXISTS " + PDFDAO.TABLE_NAME);
                 db.execSQL("DROP TABLE IF EXISTS " + CategoryDAO.TABLE_NAME);
+                db.execSQL("DROP TABLE IF EXISTS " + UserDAO.TABLE_NAME);
 
                 // Delete thumbnails
                 var directory = this.ctx.getFilesDir();

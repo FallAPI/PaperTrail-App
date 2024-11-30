@@ -3,6 +3,7 @@ package com.group2.papertrail.model;
 public class User {
     private int userId;
     private String username;
+    private String email;
     private String password;
 
     public int getUserId() {
@@ -19,6 +20,14 @@ public class User {
 
     public String getUsername() {
         return username;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setPassword(String password) {
