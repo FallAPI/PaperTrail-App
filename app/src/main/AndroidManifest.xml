@@ -18,9 +18,9 @@
             android:name=".ui.standalone.AddPDFActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.auth.RegisterActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="true"
-            android:label="@string/app_name">
+            android:theme="@style/Theme.PaperTrail.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,6 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.auth.LoginActivity" android:exported="false"/>
+        <activity android:name=".ui.auth.RegisterActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="false"/>
     </application>
 

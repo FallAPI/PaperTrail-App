@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.core.splashscreen)
     implementation(libs.jbcrypt)
     implementation(libs.appcompat)
     implementation(libs.material)
