@@ -63,6 +63,8 @@ public class TabFragment extends Fragment {
 
         binding.pdfRecyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 2));
 
+
+        // TODO: refactor!!!!! putting observer inside callback could pottentially cause memory leaks
         this.pdfViewModel.loadPDF(getArguments().getLong("tabId"), result -> {
             this.pdfViewModel.getPdfFiles().observe(getViewLifecycleOwner(), pdfs -> {
                 var pdfComponentList = pdfs.stream().map(PDFComponent::new).collect(Collectors.toList()); // same as return new PDFComponent(pdf)

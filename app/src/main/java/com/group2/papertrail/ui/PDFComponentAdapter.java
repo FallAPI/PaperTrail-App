@@ -18,6 +18,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.group2.papertrail.R;
+import com.group2.papertrail.ui.home.HomeViewModel;
+import com.group2.papertrail.util.RecentlyViewedUtil;
+import com.group2.papertrail.util.SharedPreferencesManager;
 import com.group2.papertrail.util.ThumbnailManager;
 import com.rajat.pdfviewer.PdfViewerActivity;
 import com.rajat.pdfviewer.util.saveTo;
@@ -90,6 +93,9 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
                     saveTo.ASK_EVERYTIME,
                     false
             );
+
+            // Update recently viewed PDFs through HomeViewModel
+            HomeViewModel.updateRecentlyViewedPDF(holder.itemView.getContext(), item.getPdf().getId());
 
             holder.itemView.getContext().startActivity(pdfIntent);
         });

@@ -9,6 +9,7 @@ import com.group2.papertrail.model.Category;
 import com.group2.papertrail.model.PDF;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -118,6 +119,44 @@ public class PDFDAO implements  BaseDAO<PDF> {
         var cursor = db.query(TABLE_NAME, null,
                 "category_id = ?", new String[]{String.valueOf(categoryId)},
                 null, null, null);
+
+        while (cursor.moveToNext()) {
+            var pdf = new PDF(
+                    cursor.getLong(cursor.getColumnIndexOrThrow("id")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("file_name")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("description")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("uri")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("thumbnail_file_path")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("is_favorite")) == 1,
+                    cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("author")),
+                    cursor.getLong(cursor.getColumnIndexOrThrow("size")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("page_count")),
+                    new Date((long) cursor.getInt(cursor.getColumnIndexOrThrow("created_at")) * 1000),
+                    new Date((long) cursor.getInt(cursor.getColumnIndexOrThrow("updated_at")) * 1000),
+                    categoryDAO.findById(cursor.getInt(cursor.getColumnIndexOrThrow("category_id")))
+            );
+
+            pdfs.add(pdf);
+        }
+        cursor.close();
+        return pdfs;
+    }
+
+    public List<PDF> findAllByRangeId(Long[] ids) {
+        var pdfs = new ArrayList<PDF>();
+        var db = dbManager.getReadableDatabase();
+
+        // Create a string with placeholders for each id
+        String placeholders = String.join(",", Collections.nCopies(ids.length, "?"));
+        String selection = "id IN (" + placeholders + ")";
+
+        // Convert Long[] to String[]
+        String[] selectionArgs = Arrays.stream(ids)
+                .map(String::valueOf)
+                .toArray(String[]::new);
+
+        var cursor = db.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
 
         while (cursor.moveToNext()) {
             var pdf = new PDF(
