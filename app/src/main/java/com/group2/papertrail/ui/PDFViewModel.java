@@ -54,6 +54,26 @@ public class PDFViewModel extends ViewModel {
         this.isLoading.setValue(state);
     }
 
+    public void loadPDF(Long[] ids, Callback<PDFOperationResult> callback) {
+        setIsLoading(true);
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                List<PDF> pdfs = pdfDAO.findAllByRangeId(ids);
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    pdfFiles.setValue(pdfs);
+                    setIsLoading(false);
+                    callback.onResult(PDFOperationResult.SUCCESS);
+                });
+            } catch (Exception e) {
+                Log.e("PDF_VM", "Error loading pdf", e);
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    setIsLoading(false);
+                    callback.onResult(PDFOperationResult.ERROR);
+                });
+            }
+        });
+    }
+
     public void loadPDF(long categoryId, Callback<PDFOperationResult> callback) {
         setIsLoading(true);
         Executors.newSingleThreadExecutor().execute(() -> {
