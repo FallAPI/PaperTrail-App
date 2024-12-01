@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.library.tab.AddCategoryFragment"
-    android:paddingTop="20dp">
+    tools:context=".ui.library.tab.AddCategoryFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/childConstraint"
@@ -16,8 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        android:paddingHorizontal="15dp"
-        android:layout_marginTop="?attr/actionBarSize">
+        android:paddingHorizontal="15dp">
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/progress"
