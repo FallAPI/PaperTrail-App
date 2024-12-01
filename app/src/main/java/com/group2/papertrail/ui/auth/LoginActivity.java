@@ -18,8 +18,8 @@ public class LoginActivity extends AppCompatActivity {
     private UserDAO userDAO;
 
     @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -27,6 +27,8 @@ public class LoginActivity extends AppCompatActivity {
         userDAO = new UserDAO(this);
 
         binding.btnLogin.setOnClickListener(v -> LoginProcess());
+
+        binding.RegisterLink.setOnClickListener(v -> navigateTo(RegisterActivity.class));
     }
 
     private void LoginProcess(){
@@ -40,15 +42,16 @@ public class LoginActivity extends AppCompatActivity {
         boolean isLoginSuccessful = userDAO.loginUser(username, password);
         if (isLoginSuccessful){
             Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
-            navigateToHome();
+            navigateTo(MainActivity.class);
         }else {
             Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void navigateToHome(){
-        Intent intent = new Intent(this, MainActivity.class);
+    private void navigateTo(Class<?> targetActivity){
+        Intent intent = new Intent(this, targetActivity);
         startActivity(intent);
         finish();
     }
+
 }

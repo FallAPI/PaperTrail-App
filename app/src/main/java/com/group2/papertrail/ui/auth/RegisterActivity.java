@@ -29,6 +29,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         binding.btnRegister.setOnClickListener(v -> registerUser());
 
+        binding.LoginLink.setOnClickListener(v -> navigateToLogin());
+
     }
 
 
