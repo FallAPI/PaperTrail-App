@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.group2.papertrail.R;
@@ -47,6 +48,12 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
         var item = items.get(position);
 
         holder.titleTextView.setText(!item.getPdf().getTitle().isEmpty() ? item.getPdf().getTitle() : item.getPdf().getFileName());
+
+        holder.actionButton.setOnClickListener(view -> {
+            if (view.getId() == R.id.item_menu){
+                showPopupMenu(view, position);
+            }
+        });
 
         if (item.getPdf().getThumbnailFilePath() != null) {
             if (!item.isLoading()) {
@@ -120,5 +127,32 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
             progressBar = pdfView.findViewById(R.id.item_progress_circular);
             actionButton = pdfView.findViewById(R.id.item_menu);
         }
+    }
+
+
+
+
+    private void showPopupMenu(View view, int position){
+        androidx.appcompat.widget.PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
+        popupMenu.getMenuInflater().inflate(R.menu.menu_item_actions, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(menuItem -> {
+            if (menuItem.getItemId() == R.id.action_detail) {
+                // Handle "Details" action
+
+            } else if (menuItem.getItemId() == R.id.action_edit) {
+                // Handle "Edit" action
+
+            } else if (menuItem.getItemId() == R.id.action_remove) {
+                // Handle "Remove" action
+
+            } else if (menuItem.getItemId() == R.id.action_favorite) {
+                // Handle "Favorite" action
+
+            }
+            return true;
+        });
+
+        popupMenu.show();
     }
 }

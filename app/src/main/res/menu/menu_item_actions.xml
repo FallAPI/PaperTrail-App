@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_detail"
+        android:icon="@drawable/ic_info"
+        android:title="Details" />
+
+    <item
+        android:id="@+id/action_edit"
+        android:icon="@drawable/ic_edit_square"
+        android:title="Edit" />
+    <item
+        android:id="@+id/action_remove"
+        android:icon="@drawable/ic_delete"
+        android:title="Remove" />
+
+    <item
+        android:id="@+id/action_favorite"
+        android:icon="@drawable/ic_star"
+        android:title="Favorite" />
+
+</menu>
