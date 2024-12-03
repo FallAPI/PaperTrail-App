@@ -2,6 +2,8 @@ package com.group2.papertrail.ui;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -20,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.group2.papertrail.R;
 import com.group2.papertrail.ui.home.HomeViewModel;
+import com.group2.papertrail.ui.standalone.PDFDetailActivity;
 import com.group2.papertrail.util.RecentlyViewedUtil;
 import com.group2.papertrail.util.SharedPreferencesManager;
 import com.group2.papertrail.util.ThumbnailManager;
@@ -130,16 +133,17 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
     }
 
 
-
-
     private void showPopupMenu(View view, int position){
+        var item = items.get(position);
         androidx.appcompat.widget.PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
         popupMenu.getMenuInflater().inflate(R.menu.menu_item_actions, popupMenu.getMenu());
 
         popupMenu.setOnMenuItemClickListener(menuItem -> {
             if (menuItem.getItemId() == R.id.action_detail) {
                 // Handle "Details" action
-
+                var intent = new Intent(view.getContext(), PDFDetailActivity.class);
+                intent.putExtra("pdf", item.getPdf());
+                view.getContext().startActivity(intent);
             } else if (menuItem.getItemId() == R.id.action_edit) {
                 // Handle "Edit" action
 
