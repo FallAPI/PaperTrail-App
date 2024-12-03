@@ -19,8 +19,9 @@ public class PDF implements Parcelable {
     private Date createdAt;
     private Date updatedAt;
     private Category category;
+    private boolean isOriginalDate;
 
-    public PDF(long id, String fileName, String description, String URI, String thumbnailFilePath, boolean isFavorite, String title, String author, long size, int pageCount, Date createdAt, Date updatedAt, Category category) {
+    public PDF(long id, String fileName, String description, String URI, String thumbnailFilePath, boolean isFavorite, String title, String author, long size, int pageCount, Date createdAt, Date updatedAt, Category category, boolean isOriginalDate) {
         this.id = id;
         this.fileName = fileName;
         this.description = description;
@@ -34,17 +35,19 @@ public class PDF implements Parcelable {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.category = category;
+        this.isOriginalDate = isOriginalDate;
     }
 
-    public PDF(String fileName, String URI, Category category, long size, Date createdAt) {
+    public PDF(String fileName, String URI, Category category, long size, Date createdAt, boolean isOriginalDate) {
         this.fileName = fileName;
         this.URI = URI;
         this.category = category;
         this.size = size;
         this.createdAt = createdAt;
+        this.isOriginalDate = isOriginalDate;
     }
 
-    public PDF(String fileName, String URI, String thumbnailFilePath, String title, String author, long size, int pageCount, Date createdAt, Category category) {
+    public PDF(String fileName, String URI, String thumbnailFilePath, String title, String author, long size, int pageCount, Date createdAt, Category category, boolean isOriginalDate) {
         this.fileName = fileName;
         this.URI = URI;
         this.thumbnailFilePath = thumbnailFilePath;
@@ -54,6 +57,7 @@ public class PDF implements Parcelable {
         this.pageCount = pageCount;
         this.category = category;
         this.createdAt = createdAt;
+        this.isOriginalDate = isOriginalDate;
     }
 
     protected PDF(Parcel in) {
@@ -70,6 +74,7 @@ public class PDF implements Parcelable {
         createdAt = new Date(in.readLong());
         updatedAt = new Date(in.readLong());
         category = in.readParcelable(Category.class.getClassLoader());
+        isOriginalDate = in.readByte() != 0;
     }
 
     @Override
@@ -87,6 +92,7 @@ public class PDF implements Parcelable {
         dest.writeLong(createdAt != null ? createdAt.getTime() : -1);
         dest.writeLong(updatedAt != null ? updatedAt.getTime() : -1);
         dest.writeParcelable(category, flags);
+        dest.writeByte((byte) (isOriginalDate ? 1 : 0));
     }
 
     @Override
@@ -210,5 +216,13 @@ public class PDF implements Parcelable {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public boolean isOriginalDate() {
+        return isOriginalDate;
+    }
+
+    public void setOriginalDate(boolean originalDate) {
+        isOriginalDate = originalDate;
     }
 }

@@ -54,6 +54,13 @@ public class PDFDetailActivity extends AppCompatActivity {
         binding.sizeTextView.setText(humanReadableByteCountSI(pdf.getSize()));
         binding.pageCountTextView.setText(String.valueOf(pdf.getPageCount()));
         binding.dateCreatedTextView.setText(pdf.getCreatedAt() != null ? pdf.getCreatedAt().toString() : "-");
+
+        if(pdf.isOriginalDate()) {
+            binding.dateCreatedLabel.setText("Date created");
+        } else {
+            binding.dateCreatedLabel.setText("Date added");
+        }
+
         binding.dateUpdatedTextView.setText(pdf.getUpdatedAt() != null && pdf.getUpdatedAt().getTime() != 0 ? pdf.getUpdatedAt().toString() : "-");
         binding.categoryTextView.setText(pdf.getCategory() != null ? pdf.getCategory().getName() : "-");
 
