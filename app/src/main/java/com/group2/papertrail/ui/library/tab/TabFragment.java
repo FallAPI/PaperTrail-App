@@ -59,7 +59,6 @@ public class TabFragment extends Fragment {
 
         tabViewModel.setTabName(getArguments().getString("tabName"));
 
-        binding.placeholderTxt.setText(tabViewModel.getTabName().getValue());
 
         binding.pdfRecyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 2));
 
@@ -67,6 +66,15 @@ public class TabFragment extends Fragment {
         // TODO: refactor!!!!! putting observer inside callback could pottentially cause memory leaks
         this.pdfViewModel.loadPDF(getArguments().getLong("tabId"), result -> {
             this.pdfViewModel.getPdfFiles().observe(getViewLifecycleOwner(), pdfs -> {
+
+                if (pdfs.isEmpty()) {
+                    binding.placeholderTxt.setText("No PDF in this category");
+                    binding.placeholderTxt.setVisibility(View.VISIBLE);
+                } else {
+                    binding.placeholderTxt.setVisibility(View.GONE);
+                }
+
+
                 var pdfComponentList = pdfs.stream().map(PDFComponent::new).collect(Collectors.toList()); // same as return new PDFComponent(pdf)
                 var pdfAdapter = new PDFComponentAdapter(pdfComponentList);
                 binding.pdfRecyclerView.setAdapter(pdfAdapter);
