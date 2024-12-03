@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 public class DatabaseManager extends SQLiteOpenHelper {
     private static final String DB_NAME = "papertrail.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
     private static DatabaseManager instance;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -41,6 +41,9 @@ public class DatabaseManager extends SQLiteOpenHelper {
         db.execSQL(CategoryDAO.CREATE_TABLE);
         db.execSQL(PDFDAO.CREATE_TABLE);
         db.execSQL(UserDAO.CREATE_TABLE);
+        
+        // Add default categories when database is first created
+        addStaticValues(db);
     }
 
     @Override
@@ -80,11 +83,6 @@ public class DatabaseManager extends SQLiteOpenHelper {
 
                 // Recreate tables
                 onCreate(db);
-
-                // Add static values
-                addStaticValues(db);
-
-
 
                 db.setTransactionSuccessful();
             } catch (Exception e) {
