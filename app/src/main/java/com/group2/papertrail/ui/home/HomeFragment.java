@@ -21,6 +21,7 @@ import com.group2.papertrail.ui.PDFViewModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -64,6 +65,8 @@ public class HomeFragment extends Fragment {
 
         pdfViewModel.getPdfFiles().observe(getViewLifecycleOwner(), pdfs -> {
             var pdfComponentList = pdfs.stream().map(PDFComponent::new).collect(Collectors.toList()); // same as return new PDFComponent(pdf)
+            var shallowList = pdfComponentList.subList(0, pdfComponentList.size());
+            Collections.reverse(shallowList);
             var pdfAdapter = new PDFComponentAdapter(pdfComponentList);
             binding.reclyerViewRecentlyUsed.setAdapter(pdfAdapter);
         });

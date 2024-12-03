@@ -19,6 +19,7 @@ import com.group2.papertrail.util.PDFManager;
 import com.group2.papertrail.util.ThumbnailManager;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -107,7 +108,18 @@ public class PDFViewModel extends ViewModel {
                 var thumbnailURI = ThumbnailManager.saveThumbnailToStorage(this.ctx, thumbnailBitmap);
                 var pdfMetadata = PDFManager.readPDFMetadata(this.ctx, metadata.getFileUri());
 
-                var newPdf = new PDF(metadata.getFileName(), metadata.getFileUri().toString(), thumbnailURI, pdfMetadata.getTitle(), pdfMetadata.getAuthor(), metadata.getFileSize(), pdfMetadata.getPageCount(), pdfMetadata.getCreationDate(), category);
+                var newPdf = new PDF(
+                        metadata.getFileName(),
+                        metadata.getFileUri().toString(),
+                        thumbnailURI,
+                        pdfMetadata.getTitle(),
+                        pdfMetadata.getAuthor(),
+                        metadata.getFileSize(),
+                        pdfMetadata.getPageCount(),
+                        pdfMetadata.getCreationDate() != null ? pdfMetadata.getCreationDate() : new Date(),
+                        category,
+                        pdfMetadata.getCreationDate() != null
+                );
 
                 pdfDAO.insert(newPdf);
                 new Handler(Looper.getMainLooper()).post(() -> {
