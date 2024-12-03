@@ -1,8 +1,11 @@
 package com.group2.papertrail.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Date;
 
-public class PDF {
+public class PDF implements Parcelable {
     private long id;
     private String fileName;
     private String description;
@@ -53,6 +56,55 @@ public class PDF {
         this.createdAt = createdAt;
     }
 
+    protected PDF(Parcel in) {
+        id = in.readLong();
+        fileName = in.readString();
+        description = in.readString();
+        URI = in.readString();
+        thumbnailFilePath = in.readString();
+        isFavorite = in.readByte() != 0;
+        title = in.readString();
+        author = in.readString();
+        size = in.readLong();
+        pageCount = in.readInt();
+        createdAt = new Date(in.readLong());
+        updatedAt = new Date(in.readLong());
+        category = in.readParcelable(Category.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(fileName);
+        dest.writeString(description);
+        dest.writeString(URI);
+        dest.writeString(thumbnailFilePath);
+        dest.writeByte((byte) (isFavorite ? 1 : 0));
+        dest.writeString(title);
+        dest.writeString(author);
+        dest.writeLong(size);
+        dest.writeInt(pageCount);
+        dest.writeLong(createdAt != null ? createdAt.getTime() : -1);
+        dest.writeLong(updatedAt != null ? updatedAt.getTime() : -1);
+        dest.writeParcelable(category, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<PDF> CREATOR = new Creator<PDF>() {
+        @Override
+        public PDF createFromParcel(Parcel in) {
+            return new PDF(in);
+        }
+
+        @Override
+        public PDF[] newArray(int size) {
+            return new PDF[size];
+        }
+    };
 
     public long getId() {
         return id;

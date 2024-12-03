@@ -104,8 +104,8 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     cursor.getString(cursor.getColumnIndexOrThrow("author")),
                     cursor.getLong(cursor.getColumnIndexOrThrow("size")),
                     cursor.getInt(cursor.getColumnIndexOrThrow("page_count")),
-                    new Date((long) cursor.getInt(cursor.getColumnIndexOrThrow("created_at")) * 1000),
-                    new Date((long) cursor.getInt(cursor.getColumnIndexOrThrow("updated_at")) * 1000),
+                    new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("created_at"))),
+                    new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("updated_at"))),
                     categoryDAO.findById(cursor.getInt(cursor.getColumnIndexOrThrow("category_id")))
             );
         }
@@ -132,8 +132,8 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     cursor.getString(cursor.getColumnIndexOrThrow("author")),
                     cursor.getLong(cursor.getColumnIndexOrThrow("size")),
                     cursor.getInt(cursor.getColumnIndexOrThrow("page_count")),
-                    new Date((long) cursor.getInt(cursor.getColumnIndexOrThrow("created_at")) * 1000),
-                    new Date((long) cursor.getInt(cursor.getColumnIndexOrThrow("updated_at")) * 1000),
+                    new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("created_at"))),
+                    new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("updated_at"))),
                     categoryDAO.findById(cursor.getInt(cursor.getColumnIndexOrThrow("category_id")))
             );
 
@@ -170,8 +170,8 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     cursor.getString(cursor.getColumnIndexOrThrow("author")),
                     cursor.getLong(cursor.getColumnIndexOrThrow("size")),
                     cursor.getInt(cursor.getColumnIndexOrThrow("page_count")),
-                    new Date((long) cursor.getInt(cursor.getColumnIndexOrThrow("created_at")) * 1000),
-                    new Date((long) cursor.getInt(cursor.getColumnIndexOrThrow("updated_at")) * 1000),
+                    new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("created_at"))),
+                    new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("updated_at"))),
                     categoryDAO.findById(cursor.getInt(cursor.getColumnIndexOrThrow("category_id")))
             );
 
@@ -200,8 +200,8 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     cursor.getString(cursor.getColumnIndexOrThrow("author")),
                     cursor.getLong(cursor.getColumnIndexOrThrow("size")),
                     cursor.getInt(cursor.getColumnIndexOrThrow("page_count")),
-                    new Date((long) cursor.getInt(cursor.getColumnIndexOrThrow("created_at")) * 1000),
-                    new Date((long) cursor.getInt(cursor.getColumnIndexOrThrow("updated_at")) * 1000),
+                    new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("created_at"))),
+                    new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("updated_at"))),
                     categoryDAO.findById(cursor.getInt(cursor.getColumnIndexOrThrow("category_id")))
             );
 
