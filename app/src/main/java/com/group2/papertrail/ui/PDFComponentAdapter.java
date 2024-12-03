@@ -1,5 +1,7 @@
 package com.group2.papertrail.ui;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,10 +20,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.widget.AlertDialogLayout;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.view.menu.MenuPopupHelper;
 
 import com.group2.papertrail.R;
+import com.group2.papertrail.dao.PDFDAO;
+import com.group2.papertrail.model.PDF;
 import com.group2.papertrail.ui.home.HomeViewModel;
 import com.group2.papertrail.ui.standalone.PDFDetailActivity;
 import com.group2.papertrail.util.RecentlyViewedUtil;
@@ -34,7 +42,6 @@ import java.util.concurrent.Executors;
 
 public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapter.PDFViewHolder> {
     private List<PDFComponent> items;
-
     public PDFComponentAdapter(List<PDFComponent> items) {
         this.items = items;
     }
@@ -138,6 +145,8 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
         androidx.appcompat.widget.PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
         popupMenu.getMenuInflater().inflate(R.menu.menu_item_actions, popupMenu.getMenu());
 
+        popupMenu.setForceShowIcon(true);
+
         popupMenu.setOnMenuItemClickListener(menuItem -> {
             if (menuItem.getItemId() == R.id.action_detail) {
                 // Handle "Details" action
@@ -149,10 +158,53 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
 
             } else if (menuItem.getItemId() == R.id.action_remove) {
                 // Handle "Remove" action
+                new AlertDialog.Builder(view.getContext())
+                        .setTitle("Remove PDF")
+                        .setMessage("Are you sure you want to remove this file?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            try {
+                                PDFDAO pdfDAO = new PDFDAO(view.getContext());
+                                int deletedRows = pdfDAO.delete(item.getPdf());
+
+                                if (deletedRows > 0) {
+                                    if (view.getContext() instanceof Activity) {
+                                        ((Activity) view.getContext()).runOnUiThread(() -> {
+                                            items.remove(position);
+                                            notifyItemRemoved(position);
+                                        });
+                                    }
+                                    Toast.makeText(view.getContext(), "Succesfully to detele PDF", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (Exception e) {
+                                Log.e("DeleteError", "Error deleting PDF", e);
+                                // Optional: show user-friendly error toast
+                                Toast.makeText(view.getContext(), "Failed to delete PDF", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
 
             } else if (menuItem.getItemId() == R.id.action_favorite) {
                 // Handle "Favorite" action
+                PDF currentPDF = item.getPdf();
+                boolean newFavoriteStatus = !currentPDF.isFavorite();
+                currentPDF.setFavorite(newFavoriteStatus);
 
+                PDFDAO pdfdao = new PDFDAO(view.getContext());
+                pdfdao.update(currentPDF);
+
+                MenuItem favoriteMenuItem = popupMenu.getMenu().findItem(R.id.action_favorite);
+                if (newFavoriteStatus){
+                    favoriteMenuItem.setTitle("Unfavorite");
+                    favoriteMenuItem.setIcon(R.drawable.ic_star_filled);
+                }else{
+                    favoriteMenuItem.setTitle("Favorite");
+                    favoriteMenuItem.setIcon(R.drawable.ic_star);
+                }
+
+                notifyItemChanged(position);
+
+                Toast.makeText(view.getContext(), newFavoriteStatus ? "Added from Favorites" : "Removed from Favorites" , Toast.LENGTH_SHORT).show();
             }
             return true;
         });
