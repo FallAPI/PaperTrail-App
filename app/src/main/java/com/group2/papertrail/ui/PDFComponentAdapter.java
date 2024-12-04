@@ -160,21 +160,29 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
                 // Handle "Remove" action
                 new AlertDialog.Builder(view.getContext())
                         .setTitle("Remove PDF")
-                        .setMessage("Are you sure you want to remove this file?")
+                        .setMessage("Are you sure you want to remove this PDF?")
                         .setPositiveButton("Yes", (dialog, which) -> {
                             try {
-                                PDFDAO pdfDAO = new PDFDAO(view.getContext());
-                                int deletedRows = pdfDAO.delete(item.getPdf());
+//                                PDFDAO pdfDAO = new PDFDAO(view.getContext());
+//                                int deletedRows = pdfDAO.delete(item.getPdf());
 
-                                if (deletedRows > 0) {
-                                    if (view.getContext() instanceof Activity) {
-                                        ((Activity) view.getContext()).runOnUiThread(() -> {
+                                PDFDataManager.getInstance(view.getContext().getApplicationContext()).removePDF(item.getPdf(), result -> {
+                                    switch (result) {
+                                        case SUCCESS:
                                             items.remove(position);
                                             notifyItemRemoved(position);
-                                        });
+                                            break;
+                                        case ERROR:
+                                            Toast.makeText(view.getContext(), "Succesfully to detele PDF", Toast.LENGTH_SHORT).show();
                                     }
-                                    Toast.makeText(view.getContext(), "Succesfully to detele PDF", Toast.LENGTH_SHORT).show();
-                                }
+                                });
+
+//                                if (deletedRows > 0) {
+//                                    if (view.getContext() instanceof Activity) {
+//                                        ((Activity) view.getContext()).runOnUiThread(() -> {
+//                                        });
+//                                    }
+//                                }
                             } catch (Exception e) {
                                 Log.e("DeleteError", "Error deleting PDF", e);
                                 // Optional: show user-friendly error toast

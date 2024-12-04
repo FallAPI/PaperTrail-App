@@ -3,6 +3,7 @@ package com.group2.papertrail.ui;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.telecom.Call;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -163,6 +164,30 @@ public class PDFDataManager {
                 });
             }
         });
+    }
+
+    public void removePDF(PDF pdf, Callback<PDFOperationResult> callback) {
+        try {
+            Executors.newSingleThreadExecutor().execute(() -> {
+
+                var success = ThumbnailManager.deleteThumbnail(ctx, pdf.getThumbnailFilePath());
+                if (success) {
+                    int rowsAffected = pdfDAO.delete(pdf);
+                    if (rowsAffected > 0) {
+                        new Handler(Looper.getMainLooper()).post(() -> {
+                            setDataChanged(true);
+                            callback.onResult(PDFOperationResult.SUCCESS);
+                        });
+                    }
+                } else {
+                    callback.onResult(PDFOperationResult.ERROR);
+                }
+            });
+            return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        callback.onResult(PDFOperationResult.ERROR);
     }
 
     public LiveData<Boolean> isDataChanged() {
