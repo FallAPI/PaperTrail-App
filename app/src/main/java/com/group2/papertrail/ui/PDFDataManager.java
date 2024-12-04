@@ -1,14 +1,12 @@
 package com.group2.papertrail.ui;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.telecom.Call;
 import android.util.Log;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.group2.papertrail.dao.PDFDAO;
 import com.group2.papertrail.model.Category;
@@ -23,8 +21,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-public class PDFViewModel extends ViewModel {
+public class PDFDataManager {
+    private static PDFDataManager instance;
     private MutableLiveData<List<PDF>> pdfFiles;
+
+    private final MutableLiveData<Boolean> isDataChanged = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final Context ctx;
 
@@ -36,11 +37,17 @@ public class PDFViewModel extends ViewModel {
         EMPTY_FILE
     }
 
-    public PDFViewModel(Application app) {
+    private PDFDataManager(Context context) {
         this.pdfFiles = new MutableLiveData<>(new ArrayList<PDF>());
-        this.ctx = app.getApplicationContext();
+        this.ctx = context.getApplicationContext();
         this.pdfDAO = new PDFDAO(this.ctx);
+    }
 
+    public static synchronized PDFDataManager getInstance(Context context) {
+        if (instance == null) {
+            instance = new PDFDataManager(context);
+        }
+        return instance;
     }
 
     public MutableLiveData<List<PDF>> getPdfFiles() {
@@ -95,6 +102,27 @@ public class PDFViewModel extends ViewModel {
         });
     }
 
+    public void loadPDF(Callback<PDFOperationResult> callback) {
+        setIsLoading(true);
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                List<PDF> pdfs = pdfDAO.findAll();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    pdfFiles.setValue(pdfs);
+                    setIsLoading(false);
+                    isDataChanged.setValue(false);
+                    callback.onResult(PDFOperationResult.SUCCESS);
+                });
+            } catch (Exception e) {
+                Log.e("PDF_VM", "Error loading pdf", e);
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    setIsLoading(false);
+                    callback.onResult(PDFOperationResult.ERROR);
+                });
+            }
+        });
+    }
+
     public void addPDF(FilePicker.FileMetadata metadata, Category category, Callback<PDFOperationResult> callback) {
         if (metadata == null || category == null) {
             callback.onResult(PDFOperationResult.EMPTY_FILE);
@@ -123,10 +151,9 @@ public class PDFViewModel extends ViewModel {
 
                 pdfDAO.insert(newPdf);
                 new Handler(Looper.getMainLooper()).post(() -> {
+                    isDataChanged.setValue(true);
                     setIsLoading(false);
-                    loadPDF(category.getId(), result -> {
-                        callback.onResult(PDFOperationResult.SUCCESS);
-                    });
+                    callback.onResult(PDFOperationResult.SUCCESS);
                 });
             } catch (Exception e) {
                 Log.e("PDF_VM", "Error inserting new PDF", e);
@@ -136,5 +163,13 @@ public class PDFViewModel extends ViewModel {
                 });
             }
         });
+    }
+
+    public LiveData<Boolean> isDataChanged() {
+        return isDataChanged;
+    }
+
+    public void setDataChanged(boolean dataChanged) {
+        isDataChanged.setValue(dataChanged);
     }
 }
