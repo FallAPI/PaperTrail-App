@@ -211,4 +211,9 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
 
         popupMenu.show();
     }
+
+    public void updateData(List<PDFComponent> pdfComponents) {
+        this.items = pdfComponents;
+        notifyDataSetChanged();
+    }
 }
