@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,9 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.group2.papertrail.databinding.FragmentHomeBinding;
 import com.group2.papertrail.ui.PDFComponent;
 import com.group2.papertrail.ui.PDFComponentAdapter;
-import com.group2.papertrail.ui.PDFViewModel;
+import com.group2.papertrail.ui.PDFDataManager;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +28,7 @@ public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private HomeViewModel homeViewModel;
-    private PDFViewModel pdfViewModel;
+    private PDFDataManager pdfDataManager;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         homeViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
@@ -41,35 +39,33 @@ public class HomeFragment extends Fragment {
             }
         }).get(HomeViewModel.class);
 
-        pdfViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
-            @NonNull
-            @Override
-            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-                return (T) new PDFViewModel(requireActivity().getApplication());
-            }
-        }).get(PDFViewModel.class);
+        this.pdfDataManager = PDFDataManager.getInstance(requireActivity().getApplicationContext());
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
 
-        homeViewModel.getPdfIds().observe(getViewLifecycleOwner(), pdfIds -> {
-            pdfViewModel.loadPDF(pdfIds.toArray(new Long[0]), result -> {
-                if (Objects.requireNonNull(result) == PDFViewModel.PDFOperationResult.ERROR) {
-                    Toast.makeText(requireContext(), "Something went wrong when loading recently viewed", Toast.LENGTH_SHORT).show();
+        pdfDataManager.loadPDF(result -> {
+            if (Objects.requireNonNull(result) == PDFDataManager.PDFOperationResult.ERROR || Objects.requireNonNull(result) == PDFDataManager.PDFOperationResult.EMPTY_FILE) {
+                Toast.makeText(requireContext(), "Something went wrong when loading recently viewed", Toast.LENGTH_SHORT).show();
+            }
+            homeViewModel.getPdfIds().observe(getViewLifecycleOwner(), pdfIds -> {
+                if (pdfIds != null && !pdfIds.isEmpty()) {
+                    pdfDataManager.getPdfFiles().observe(getViewLifecycleOwner(), pdfs -> {
+                        var pdfComponentList = pdfs.stream()
+                            .filter(pdf -> pdfIds.contains(pdf.getId()))
+                            .map(PDFComponent::new)
+                            .collect(Collectors.toList());
+                        var shallowList = pdfComponentList.subList(0, pdfComponentList.size());
+                        Collections.reverse(shallowList);
+                        var pdfAdapter = new PDFComponentAdapter(pdfComponentList);
+                        binding.reclyerViewRecentlyUsed.setAdapter(pdfAdapter);
+                    });
                 }
             });
         });
 
-        binding.reclyerViewRecentlyUsed.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false  ));
-
-        pdfViewModel.getPdfFiles().observe(getViewLifecycleOwner(), pdfs -> {
-            var pdfComponentList = pdfs.stream().map(PDFComponent::new).collect(Collectors.toList()); // same as return new PDFComponent(pdf)
-            var shallowList = pdfComponentList.subList(0, pdfComponentList.size());
-            Collections.reverse(shallowList);
-            var pdfAdapter = new PDFComponentAdapter(pdfComponentList);
-            binding.reclyerViewRecentlyUsed.setAdapter(pdfAdapter);
-        });
+        binding.reclyerViewRecentlyUsed.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         // Setup Favorites RecyclerView
         RecyclerView favoriteView = binding.recyclerViewFavorites;

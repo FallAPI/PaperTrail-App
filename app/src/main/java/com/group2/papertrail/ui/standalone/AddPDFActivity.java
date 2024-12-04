@@ -1,9 +1,7 @@
 package com.group2.papertrail.ui.standalone;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -17,19 +15,15 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.group2.papertrail.R;
 import com.group2.papertrail.databinding.ActivityAddPdfactivityBinding;
-import com.group2.papertrail.model.Category;
-import com.group2.papertrail.ui.PDFViewModel;
-import com.group2.papertrail.ui.library.LibraryViewModel;
+import com.group2.papertrail.ui.PDFDataManager;
 import com.group2.papertrail.util.FilePicker;
 
 public class AddPDFActivity extends AppCompatActivity {
 
     private ActivityAddPdfactivityBinding binding;
     private AddPDFActivityViewModel addPDFActivityViewModel;
-    private PDFViewModel pdfViewModel;
+    private PDFDataManager pdfDataManager;
     private FilePicker filePicker;
-
-    // TODO: Add progress linear button when adding pdf
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +37,7 @@ public class AddPDFActivity extends AppCompatActivity {
             }
         }).get(AddPDFActivityViewModel.class);
 
-        this.pdfViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
-            @NonNull
-            @Override
-            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-                return (T) new PDFViewModel(getApplication());
-            }
-        }).get(PDFViewModel.class);
+        this.pdfDataManager = PDFDataManager.getInstance(getApplicationContext());
 
         binding = ActivityAddPdfactivityBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -84,10 +72,11 @@ public class AddPDFActivity extends AppCompatActivity {
             }
         });
 
+        // TODO: handle duplicate pdf
         binding.addBtn.setOnClickListener(view -> {
             this.addPDFActivityViewModel.setIsLoading(true);
             toggleInput(false); // disable input
-            this.pdfViewModel.addPDF(
+            this.pdfDataManager.addPDF(
                     this.addPDFActivityViewModel.getFileMetadata().getValue(),
                     this.addPDFActivityViewModel.getSelectedCategory().getValue(),
                     result -> {
@@ -116,6 +105,7 @@ public class AddPDFActivity extends AppCompatActivity {
         return true;
     }
 
+    // TODO: handle if user cancels the file selection
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
