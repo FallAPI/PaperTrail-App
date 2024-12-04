@@ -204,7 +204,7 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
 
                 notifyItemChanged(position);
 
-                Toast.makeText(view.getContext(), newFavoriteStatus ? "Added from Favorites" : "Removed from Favorites" , Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), newFavoriteStatus ? "Added to Favorites" : "Removed from Favorites" , Toast.LENGTH_SHORT).show();
             }
             return true;
         });
