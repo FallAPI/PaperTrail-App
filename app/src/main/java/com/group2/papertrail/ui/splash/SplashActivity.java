@@ -11,10 +11,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
+import com.group2.papertrail.MainActivity;
 import com.group2.papertrail.R;
 import com.group2.papertrail.databinding.ActivitySplashScreenBinding;
-import com.group2.papertrail.ui.auth.LoginActivity;
 import com.group2.papertrail.ui.auth.RegisterActivity;
+import com.group2.papertrail.util.SharedPreferencesManager;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -34,9 +35,15 @@ public class SplashActivity extends AppCompatActivity {
         handler.postDelayed(() -> {
             splashScreen.setKeepOnScreenCondition(() -> false);
 
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            finish();
+
+            //check the userId if exist
+            long userId = SharedPreferencesManager.getInstance(this).getUserId();
+            if (userId != -1){
+                navigateTo(MainActivity.class);
+            }else {
+                navigateTo(RegisterActivity.class);
+            }
+
         }, SPLASH_DURATION);
 
     }
@@ -46,5 +53,11 @@ public class SplashActivity extends AppCompatActivity {
         super.onDestroy();
         handler.removeCallbacksAndMessages(null);
         binding = null;
+    }
+
+    private void navigateTo(Class<?> targetActivity){
+        Intent intent = new Intent(this, targetActivity);
+        startActivity(intent);
+        finish();
     }
 }

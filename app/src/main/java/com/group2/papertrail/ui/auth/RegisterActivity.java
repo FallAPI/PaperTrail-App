@@ -64,16 +64,22 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean validateInput(String username, String email, String password){
+
+        // Clear previous errors
+        binding.TextInputUsername.setError(null);
+        binding.TextInputEmail.setError(null);
+        binding.textInputPassword.setError(null);
+
         if (username.isEmpty()){
-            binding.etUsername.setError("Username is required");
+            binding.TextInputUsername.setError("Username is required");
             return false;
         }
         if (email.isEmpty() || !isValidEmail(email) ){
-            binding.etEmail.setError("Valid email is required");
+            binding.TextInputEmail.setError("Valid email is required");
             return false;
         }
         if (password.isEmpty() || password.length() < 6){
-            binding.etPassword.setError("Password must be at least 6 character");
+            binding.textInputPassword.setError("Password must be at least 6 character");
             return false;
         }
         return true;

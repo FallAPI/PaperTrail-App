@@ -27,12 +27,6 @@ public class LoginActivity extends AppCompatActivity {
 
         userDAO = new UserDAO(this);
 
-        //check if user_id exist
-        long userId = SharedPreferencesManager.getInstance(this).getUserId();
-        if (userId != -1){
-            navigateTo(MainActivity.class);
-            return;
-        }
 
         binding.btnLogin.setOnClickListener(v -> LoginProcess());
 
@@ -43,9 +37,26 @@ public class LoginActivity extends AppCompatActivity {
         String username = binding.etUsername.getText().toString().trim();
         String password = binding.etPassword.getText().toString().trim();
 
-        if (username.isEmpty() || password.isEmpty()){
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-            return;
+        // Clear previous errors
+        binding.TextInputUsername.setError(null);
+        binding.TextInputPassword.setError(null);
+
+        boolean hasError = false;
+
+        // Validate username
+        if (username.isEmpty()) {
+            binding.TextInputUsername.setError("Username is required");
+            hasError = true;
+        }
+
+        // Validate password
+        if (password.isEmpty()) {
+            binding.TextInputPassword.setError("Password is required");
+            hasError = true;
+        }
+
+        if (hasError) {
+            return; // Stop processing if there's an error
         }
         long userId = userDAO.loginUser(username, password);
         if (userId != -1){

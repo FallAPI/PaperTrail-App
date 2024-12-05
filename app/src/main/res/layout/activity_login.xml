@@ -5,20 +5,21 @@
     android:layout_width="match_parent"
     android:padding="24dp"
     android:layout_height="match_parent">
-    
+
     <TextView
         android:id="@+id/Login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login"
         android:textColor="@color/black"
-        android:textStyle="bold"
         android:textSize="36sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/TextInputUsername"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"/>
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/TextInputUsername"
@@ -26,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:hint="username"
-        app:layout_constraintBottom_toTopOf="@+id/textInputPassword"
+        app:layout_constraintBottom_toTopOf="@+id/TextInputPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Login">
@@ -40,7 +41,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputPassword"
+        android:id="@+id/TextInputPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -70,7 +71,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textInputPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/TextInputPassword" />
 
     <TextView
         android:id="@+id/RegisterLink"
@@ -84,8 +85,7 @@
         android:focusable="true"
         app:layout_constraintTop_toBottomOf="@id/btnLogin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
