@@ -146,6 +146,11 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
         androidx.appcompat.widget.PopupMenu popupMenu = new PopupMenu(view.getContext(), view);
         popupMenu.getMenuInflater().inflate(R.menu.menu_item_actions, popupMenu.getMenu());
 
+        MenuItem favoriteMenuItem = popupMenu.getMenu().findItem(R.id.action_favorite);
+        boolean isFavorite = item.getPdf().isFavorite();
+        favoriteMenuItem.setTitle(isFavorite ? "Unfavorite" : "Favorite");
+        favoriteMenuItem.setIcon(isFavorite ? R.drawable.ic_star_filled : R.drawable.ic_star);
+
         popupMenu.setForceShowIcon(true);
 
         popupMenu.setOnMenuItemClickListener(menuItem -> {
@@ -204,22 +209,13 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
                 PDFDAO pdfdao = new PDFDAO(view.getContext());
                 pdfdao.update(currentPDF);
 
-                MenuItem favoriteMenuItem = popupMenu.getMenu().findItem(R.id.action_favorite);
-                if (newFavoriteStatus){
-                    favoriteMenuItem.setTitle("Unfavorite");
-                    favoriteMenuItem.setIcon(R.drawable.ic_star_filled);
-                }else{
-                    favoriteMenuItem.setTitle("Favorite");
-                    favoriteMenuItem.setIcon(R.drawable.ic_star);
-                }
-
+                items.set(position, item);
                 notifyItemChanged(position);
 
                 Toast.makeText(view.getContext(), newFavoriteStatus ? "Added to Favorites" : "Removed from Favorites" , Toast.LENGTH_SHORT).show();
             }
             return true;
         });
-
         popupMenu.show();
     }
 
