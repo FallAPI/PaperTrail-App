@@ -49,20 +49,21 @@ public class HomeFragment extends Fragment {
             if (Objects.requireNonNull(result) == PDFDataManager.PDFOperationResult.ERROR || Objects.requireNonNull(result) == PDFDataManager.PDFOperationResult.EMPTY_FILE) {
                 Toast.makeText(requireContext(), "Something went wrong when loading recently viewed", Toast.LENGTH_SHORT).show();
             }
-            homeViewModel.getPdfIds().observe(getViewLifecycleOwner(), pdfIds -> {
-                if (pdfIds != null && !pdfIds.isEmpty()) {
-                    pdfDataManager.getPdfFiles().observe(getViewLifecycleOwner(), pdfs -> {
-                        var pdfComponentList = pdfs.stream()
-                            .filter(pdf -> pdfIds.contains(pdf.getId()))
-                            .map(PDFComponent::new)
-                            .collect(Collectors.toList());
-                        var shallowList = pdfComponentList.subList(0, pdfComponentList.size());
-                        Collections.reverse(shallowList);
-                        var pdfAdapter = new PDFComponentAdapter(pdfComponentList);
-                        binding.reclyerViewRecentlyUsed.setAdapter(pdfAdapter);
-                    });
-                }
-            });
+        });
+
+        homeViewModel.getPdfIds().observe(getViewLifecycleOwner(), pdfIds -> {
+            if (pdfIds != null && !pdfIds.isEmpty()) {
+                pdfDataManager.getPdfFiles().observe(getViewLifecycleOwner(), pdfs -> {
+                    var pdfComponentList = pdfs.stream()
+                        .filter(pdf -> pdfIds.contains(pdf.getId()))
+                        .map(PDFComponent::new)
+                        .collect(Collectors.toList());
+                    var shallowList = pdfComponentList.subList(0, pdfComponentList.size());
+                    Collections.reverse(shallowList);
+                    var pdfAdapter = new PDFComponentAdapter(pdfComponentList);
+                    binding.reclyerViewRecentlyUsed.setAdapter(pdfAdapter);
+                });
+            }
         });
 
         binding.reclyerViewRecentlyUsed.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -79,6 +80,20 @@ public class HomeFragment extends Fragment {
 
 
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        var isChanged = pdfDataManager.isDataChanged().getValue();
+        if (isChanged) {
+            pdfDataManager.loadPDF(result -> {
+                if (Objects.requireNonNull(result) == PDFDataManager.PDFOperationResult.ERROR || Objects.requireNonNull(result) == PDFDataManager.PDFOperationResult.EMPTY_FILE) {
+                    Toast.makeText(requireContext(), "Something went wrong when loading recently viewed", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     @Override
