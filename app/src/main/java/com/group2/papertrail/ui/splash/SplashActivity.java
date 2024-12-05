@@ -13,6 +13,7 @@ import androidx.core.splashscreen.SplashScreen;
 
 import com.group2.papertrail.R;
 import com.group2.papertrail.databinding.ActivitySplashScreenBinding;
+import com.group2.papertrail.ui.auth.LoginActivity;
 import com.group2.papertrail.ui.auth.RegisterActivity;
 
 public class SplashActivity extends AppCompatActivity {
@@ -33,7 +34,7 @@ public class SplashActivity extends AppCompatActivity {
         handler.postDelayed(() -> {
             splashScreen.setKeepOnScreenCondition(() -> false);
 
-            Intent intent = new Intent(this, RegisterActivity.class);
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
         }, SPLASH_DURATION);
