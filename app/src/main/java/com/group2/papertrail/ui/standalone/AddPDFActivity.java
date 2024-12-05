@@ -105,14 +105,16 @@ public class AddPDFActivity extends AppCompatActivity {
         return true;
     }
 
-    // TODO: handle if user cancels the file selection
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        FilePicker.FileMetadata metadata = filePicker.handleActivityResult(requestCode, resultCode, data);
-        addPDFActivityViewModel.setFileMetadata(metadata);
-        binding.fileName.setText(metadata.getFileName());
-        binding.fileName.setVisibility(View.VISIBLE);
+
+        if (resultCode < 0) {
+            FilePicker.FileMetadata metadata = filePicker.handleActivityResult(requestCode, resultCode, data);
+            addPDFActivityViewModel.setFileMetadata(metadata);
+            binding.fileName.setText(metadata.getFileName());
+            binding.fileName.setVisibility(View.VISIBLE);
+        }
 
     }
 
