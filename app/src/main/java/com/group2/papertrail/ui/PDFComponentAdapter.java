@@ -212,6 +212,8 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
                 items.set(position, item);
                 notifyItemChanged(position);
 
+                PDFDataManager.getInstance(view.getContext()).setDataChanged(true);
+
                 Toast.makeText(view.getContext(), newFavoriteStatus ? "Added to Favorites" : "Removed from Favorites" , Toast.LENGTH_SHORT).show();
             }
             return true;
