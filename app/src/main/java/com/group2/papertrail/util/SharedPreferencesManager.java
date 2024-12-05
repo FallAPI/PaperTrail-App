@@ -10,7 +10,7 @@ public class SharedPreferencesManager {
 
     // Preference Keys
     private static final String KEY_USER_ID = "user_id";
-    private static final String KEY_RECENTLY_VIEWED_STRING_ARRAY = "";
+    private static final String KEY_RECENTLY_VIEWED_STRING_ARRAY = "recently_viewed_ids";
 
     private SharedPreferencesManager(Context context) {
         preferences = context.getApplicationContext()
