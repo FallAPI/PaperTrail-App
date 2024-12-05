@@ -53,23 +53,10 @@ public class LibraryFragment extends Fragment {
             ViewPagerAdapter adapter = new ViewPagerAdapter(this, categoryTabs);
             binding.viewPager.setAdapter(adapter);
             new TabLayoutMediator(binding.tabLayout, binding.viewPager, (tab, position) -> {
-
-    //            View customTab = inflater.inflate(R.layout.tab_item, null);
-    //
-    //            ImageView imgView = customTab.findViewById(R.id.tab_icon);
-    //            TextView tabTxtView = customTab.findViewById(R.id.tab_title);
-
-    //            tab.setCustomView(customTab);
-
                 if (position == categoryTabs.size() - 1) {
                     tab.setText("Add");
-    //                tabTxtView.setText("Add");
-    //                tab.setIcon(R.drawable.ic_add);
-    //                imgView.setImageIcon(Icon.createWithResource(getActivity().getApplicationContext(), R.drawable.ic_add));
                 } else {
                     tab.setText(categoryTabs.get(position).getName());
-    //                tabTxtView.setText(tabNames.get(position));
-    //                imgView.setVisibility(View.GONE);
                 }
             }).attach();
 
@@ -77,6 +64,17 @@ public class LibraryFragment extends Fragment {
                 binding.tabLayout.setTabMode(TabLayout.MODE_FIXED);
             } else {
                 binding.tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+            }
+
+        });
+
+        categoryViewModel.getIsUpdated().observe(getViewLifecycleOwner(), isUpdated -> {
+            if (isUpdated) {
+                var tab = binding.tabLayout.getTabAt(categoryViewModel.getCategories().getValue().size() - 2);
+                if (tab != null) {
+                    tab.select();
+                }
+                categoryViewModel.setIsUpdated(false);
             }
         });
 

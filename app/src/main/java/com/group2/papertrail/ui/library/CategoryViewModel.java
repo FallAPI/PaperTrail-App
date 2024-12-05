@@ -16,6 +16,7 @@ import java.util.concurrent.Executors;
 public class CategoryViewModel extends ViewModel {
     private final MutableLiveData<List<Category>> categories = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> isUpdated = new MutableLiveData<>(false);
     private final CategoryDAO categoryDAO;
 
     public enum AddCategoryResult {
@@ -38,6 +39,7 @@ public class CategoryViewModel extends ViewModel {
                     categoryList.add(new Category("Add")); // DO NOT REMOVE
                     categories.setValue(categoryList);
                     setIsLoading(false);
+                    setIsUpdated(true);
                 });
             } catch (Exception e) {
                 Log.e("CATEGORY_VM", "Error loading categories", e);
@@ -87,5 +89,13 @@ public class CategoryViewModel extends ViewModel {
         new Handler(Looper.getMainLooper()).post(() ->
                 isLoading.setValue(loading)
         );
+    }
+
+    public MutableLiveData<Boolean> getIsUpdated() {
+        return isUpdated;
+    }
+
+    public void setIsUpdated(boolean state) {
+        isUpdated.setValue(state);
     }
 }
