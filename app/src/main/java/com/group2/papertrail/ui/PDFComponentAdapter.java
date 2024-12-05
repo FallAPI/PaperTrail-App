@@ -30,6 +30,7 @@ import com.group2.papertrail.R;
 import com.group2.papertrail.dao.PDFDAO;
 import com.group2.papertrail.model.PDF;
 import com.group2.papertrail.ui.home.HomeViewModel;
+import com.group2.papertrail.ui.standalone.EditPDFActivity;
 import com.group2.papertrail.ui.standalone.PDFDetailActivity;
 import com.group2.papertrail.util.RecentlyViewedUtil;
 import com.group2.papertrail.util.SharedPreferencesManager;
@@ -155,26 +156,36 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
                 view.getContext().startActivity(intent);
             } else if (menuItem.getItemId() == R.id.action_edit) {
                 // Handle "Edit" action
-
+                var intent = new Intent(view.getContext(), EditPDFActivity.class);
+                intent.putExtra("pdf", item.getPdf());
+                view.getContext().startActivity(intent);
             } else if (menuItem.getItemId() == R.id.action_remove) {
                 // Handle "Remove" action
                 new AlertDialog.Builder(view.getContext())
                         .setTitle("Remove PDF")
-                        .setMessage("Are you sure you want to remove this file?")
+                        .setMessage("Are you sure you want to remove this PDF?")
                         .setPositiveButton("Yes", (dialog, which) -> {
                             try {
-                                PDFDAO pdfDAO = new PDFDAO(view.getContext());
-                                int deletedRows = pdfDAO.delete(item.getPdf());
+//                                PDFDAO pdfDAO = new PDFDAO(view.getContext());
+//                                int deletedRows = pdfDAO.delete(item.getPdf());
 
-                                if (deletedRows > 0) {
-                                    if (view.getContext() instanceof Activity) {
-                                        ((Activity) view.getContext()).runOnUiThread(() -> {
+                                PDFDataManager.getInstance(view.getContext().getApplicationContext()).removePDF(item.getPdf(), result -> {
+                                    switch (result) {
+                                        case SUCCESS:
                                             items.remove(position);
                                             notifyItemRemoved(position);
-                                        });
+                                            break;
+                                        case ERROR:
+                                            Toast.makeText(view.getContext(), "Succesfully to detele PDF", Toast.LENGTH_SHORT).show();
                                     }
-                                    Toast.makeText(view.getContext(), "Succesfully to detele PDF", Toast.LENGTH_SHORT).show();
-                                }
+                                });
+
+//                                if (deletedRows > 0) {
+//                                    if (view.getContext() instanceof Activity) {
+//                                        ((Activity) view.getContext()).runOnUiThread(() -> {
+//                                        });
+//                                    }
+//                                }
                             } catch (Exception e) {
                                 Log.e("DeleteError", "Error deleting PDF", e);
                                 // Optional: show user-friendly error toast
@@ -204,7 +215,7 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
 
                 notifyItemChanged(position);
 
-                Toast.makeText(view.getContext(), newFavoriteStatus ? "Added from Favorites" : "Removed from Favorites" , Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), newFavoriteStatus ? "Added to Favorites" : "Removed from Favorites" , Toast.LENGTH_SHORT).show();
             }
             return true;
         });

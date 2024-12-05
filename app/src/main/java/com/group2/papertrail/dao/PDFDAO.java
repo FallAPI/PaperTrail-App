@@ -77,10 +77,12 @@ public class PDFDAO implements  BaseDAO<PDF> {
         values.put("thumbnail_file_path", model.getThumbnailFilePath());
         values.put("is_favorite", model.isFavorite());
         values.put("title", model.getTitle());
+        values.put("description", model.getDescription());
         values.put("author", model.getAuthor());
         values.put("size", model.getSize());
         values.put("page_count", model.getPageCount());
         values.put("created_at", model.getCreatedAt().getTime());
+        values.put("updated_at", new Date().getTime());
         values.put("category_id", model.getCategory().getId());
         return db.update(TABLE_NAME, values, "id = ?", new String[]{String.valueOf(model.getId())});
     }
