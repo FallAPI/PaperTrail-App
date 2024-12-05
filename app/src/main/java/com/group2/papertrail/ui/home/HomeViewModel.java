@@ -11,20 +11,22 @@ import com.group2.papertrail.util.RecentlyViewedUtil;
 import com.group2.papertrail.util.SharedPreferencesManager;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class HomeViewModel extends ViewModel {
 
-    private static MutableLiveData<List<Long>> globalPdfIds;
+    private static MutableLiveData<Set<Long>> globalPdfIds;
     private SharedPreferencesManager sharedPreferencesManager;
     private RecentlyViewedUtil recentlyViewedUtil;
-    private MutableLiveData<List<Long>> pdfIds;
+    private MutableLiveData<Set<Long>> pdfIds;
 
     public HomeViewModel(Application app) {
         this.sharedPreferencesManager = SharedPreferencesManager.getInstance(app.getApplicationContext());
         this.recentlyViewedUtil = RecentlyViewedUtil.getInstance(this.sharedPreferencesManager);
         if (globalPdfIds == null) {
-            globalPdfIds = new MutableLiveData<>(new ArrayList<>());
+            globalPdfIds = new MutableLiveData<>(new HashSet<>());
         }
         this.pdfIds = globalPdfIds;
         setPdfIds(this.recentlyViewedUtil.getPdfIds());
@@ -40,11 +42,11 @@ public class HomeViewModel extends ViewModel {
         }
     }
 
-    public void setPdfIds(List<Long> pdfIds) {
+    public void setPdfIds(Set<Long> pdfIds) {
         this.pdfIds.setValue(pdfIds);
     }
 
-    public MutableLiveData<List<Long>> getPdfIds() {
+    public MutableLiveData<Set<Long>> getPdfIds() {
         return pdfIds;
     }
 }
