@@ -30,6 +30,7 @@ import com.group2.papertrail.R;
 import com.group2.papertrail.dao.PDFDAO;
 import com.group2.papertrail.model.PDF;
 import com.group2.papertrail.ui.home.HomeViewModel;
+import com.group2.papertrail.ui.standalone.EditPDFActivity;
 import com.group2.papertrail.ui.standalone.PDFDetailActivity;
 import com.group2.papertrail.util.RecentlyViewedUtil;
 import com.group2.papertrail.util.SharedPreferencesManager;
@@ -155,7 +156,9 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
                 view.getContext().startActivity(intent);
             } else if (menuItem.getItemId() == R.id.action_edit) {
                 // Handle "Edit" action
-
+                var intent = new Intent(view.getContext(), EditPDFActivity.class);
+                intent.putExtra("pdf", item.getPdf());
+                view.getContext().startActivity(intent);
             } else if (menuItem.getItemId() == R.id.action_remove) {
                 // Handle "Remove" action
                 new AlertDialog.Builder(view.getContext())
