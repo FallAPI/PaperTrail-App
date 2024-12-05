@@ -88,6 +88,13 @@ public class TabFragment extends Fragment {
      }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        binding = null;
+    }
+
+    @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
