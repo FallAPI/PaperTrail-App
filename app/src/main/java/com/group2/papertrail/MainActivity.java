@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -17,7 +19,9 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.group2.papertrail.database.DatabaseManager;
 import com.group2.papertrail.databinding.ActivityMainBinding;
+import com.group2.papertrail.ui.auth.LoginActivity;
 import com.group2.papertrail.ui.standalone.AddPDFActivity;
+import com.group2.papertrail.util.SharedPreferencesManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,11 +52,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding.myToolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.reset) {
-                DatabaseManager.getInstance(getApplicationContext()).resetDatabaseAndAddStaticValues(() -> {
-                    Toast.makeText(this, "Database reset and static values added!", Toast.LENGTH_SHORT).show();
-                });
-                return true;
+            if (item.getItemId() == R.id.Hamburger) {
+                showPopMenu(binding.myToolbar.findViewById(R.id.Hamburger));
             }
             return false;
         });
@@ -63,5 +64,41 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.top_app_bar, menu);
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+
+    private void showPopMenu(View view){
+        PopupMenu popupMenu = new PopupMenu(this , view);
+
+        popupMenu.getMenuInflater().inflate(R.menu.hamburger_menu_item, popupMenu.getMenu());
+
+        popupMenu.setForceShowIcon(true);
+
+        popupMenu.setOnMenuItemClickListener(menuItem ->{
+            if (menuItem.getItemId() == R.id.action_delete_tabs){
+                // do delete tabs action
+                Toast.makeText(this, "Delete tabs clicked", Toast.LENGTH_SHORT).show();
+            } else if (menuItem.getItemId() == R.id.action_logout) {
+                // do logout action
+                try {
+                    logout();
+                }catch (Exception e){
+                    Toast.makeText(this, "Failed to logout", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            return true;
+        });
+        popupMenu.show();
+    }
+
+    private void logout(){
+        SharedPreferencesManager.getInstance(this).clearAllPreferences();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+
+        startActivity(intent);
+
+        finish();
     }
 }
