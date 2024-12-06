@@ -99,8 +99,9 @@ public class EditPDFViewModel extends ViewModel {
         pdf.setCategory(selectedCategory.getValue());
         pdf.setTitle(pdfTitle.getValue());
         pdf.setDescription(pdfDesc.getValue());
-        try {
-            Executors.newSingleThreadExecutor().execute(() -> {
+        
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
                 int rowsAffected = pdfDAO.update(pdf);
 
                 if (rowsAffected > 0) {
@@ -110,12 +111,14 @@ public class EditPDFViewModel extends ViewModel {
                         pdfDataManager.setDataChanged(true);
                     });
                 }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-            callback.onResult(EditPDFOperations.ERROR);
-        }
-        setIsLoading(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    setIsLoading(false);
+                    callback.onResult(EditPDFOperations.ERROR);
+                });
+            }
+        });
     }
 
     public MutableLiveData<Boolean> getIsLoading() {
