@@ -15,6 +15,7 @@ import com.group2.papertrail.model.Category;
 import com.group2.papertrail.model.PDF;
 import com.group2.papertrail.ui.PDFDataManager;
 import com.group2.papertrail.util.Callback;
+import com.group2.papertrail.util.SharedPreferencesManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class EditPDFViewModel extends ViewModel {
     private MutableLiveData<List<Category>> categories;
     private MutableLiveData<Category> selectedCategory;
     private MutableLiveData<Boolean> isLoading;
+    private SharedPreferencesManager sharedPreferencesManager;
 
     public EditPDFViewModel(PDF pdf, Application app) {
         this.pdfDataManager = PDFDataManager.getInstance(app.getApplicationContext());
@@ -39,6 +41,7 @@ public class EditPDFViewModel extends ViewModel {
         selectedCategory = new MutableLiveData<>(pdf.getCategory());
         categories = new MutableLiveData<>(new ArrayList<>());
         isLoading = new MutableLiveData<>(false);
+        sharedPreferencesManager = SharedPreferencesManager.getInstance(app.getApplicationContext());
 
         loadCategories();
     }
@@ -60,7 +63,7 @@ public class EditPDFViewModel extends ViewModel {
     public void loadCategories() {
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
-                List<Category> categoryList = categoryDAO.findAll();
+                List<Category> categoryList = categoryDAO.findAllByUserId(sharedPreferencesManager.getUserId());
                 new Handler(Looper.getMainLooper()).post(() -> {
                     this.categories.setValue(categoryList);
                 });
