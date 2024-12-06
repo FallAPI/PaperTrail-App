@@ -87,7 +87,8 @@
         }
 
         @Override
-        public List<User> findAll() {
+        public List<User> findAllByUserId(long userId) {
             return Collections.emptyList();
         }
+
     }
