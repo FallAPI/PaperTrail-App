@@ -18,9 +18,11 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.group2.papertrail.dao.CategoryDAO;
 import com.group2.papertrail.databinding.ActivityMainBinding;
 import com.group2.papertrail.model.Category;
+import com.group2.papertrail.ui.PDFDataManager;
 import com.group2.papertrail.ui.auth.LoginActivity;
 import com.group2.papertrail.ui.library.CategoryViewModel;
 import com.group2.papertrail.ui.library.ViewPagerAdapter;
@@ -29,6 +31,8 @@ import com.group2.papertrail.util.SharedPreferencesManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private CategoryViewModel categoryViewModel;
+    private SharedPreferencesManager sharedPreferencesManager;
+    private PDFDataManager pdfDataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
 //                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
 //                .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+
+        this.sharedPreferencesManager = SharedPreferencesManager.getInstance(getApplicationContext());
+        this.pdfDataManager = PDFDataManager.getInstance(getApplicationContext());
 
         setSupportActionBar(binding.myToolbar);
 
@@ -82,16 +91,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void showPopMenu(View view){
+    private void showPopMenu(View view) {
         CategoryDAO categoryDAO = new CategoryDAO(this);
-        PopupMenu popupMenu = new PopupMenu(this , view);
+        PopupMenu popupMenu = new PopupMenu(this, view);
 
         popupMenu.getMenuInflater().inflate(R.menu.hamburger_menu_item, popupMenu.getMenu());
 
         popupMenu.setForceShowIcon(true);
 
-        popupMenu.setOnMenuItemClickListener(menuItem ->{
-            if (menuItem.getItemId() == R.id.action_delete_tabs){
+        popupMenu.setOnMenuItemClickListener(menuItem -> {
+            if (menuItem.getItemId() == R.id.action_delete_tabs) {
                 // do delete category tab
                 showDeleteCategoriesDialog();
 
@@ -99,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 // do logout action
                 try {
                     logout();
-                }catch (Exception e){
+                } catch (Exception e) {
                     Toast.makeText(this, "Failed to logout", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -109,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         popupMenu.show();
     }
 
-    private void logout(){
+    private void logout() {
         SharedPreferencesManager.getInstance(getApplicationContext()).saveUserId(0);
 
         Intent intent = new Intent(this, LoginActivity.class);
@@ -136,8 +145,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Create and show the dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Delete Categories");
+        var builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle("Select categories to delete");
 
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_delete_categories, null);
         builder.setView(dialogView);
@@ -168,15 +177,52 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // Delete categories via ViewModel
-            categoryViewModel.deleteCategories(selectedCategories);
+            boolean hasChildPDFs = false;
+            for (Category category : selectedCategories) {
+                if (pdfDataManager.checkCategoryHasChildPDFs(category.getId())){
+                    hasChildPDFs = true;
+                    break;
+                }
+            }
 
-            Toast.makeText(this, "Selected categories deleted", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
+            if (hasChildPDFs) {
+                dialog.dismiss();
+                showDeleteConfirmationDialog(selectedCategories);
+            } else {
+                categoryViewModel.deleteCategories(selectedCategories);
+                Toast.makeText(this, "Selected categories deleted", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
         });
 
         dialog.show();
     }
 
+    private void showDeleteConfirmationDialog(List<Category> categoriesToDelete) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle("Warning")
+                .setMessage("Some of the selected categories contain PDFs. Deleting these categories will also delete all PDFs within them. Are you sure you want to continue?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    AtomicInteger completedDeletions = new AtomicInteger(0);
+                    AtomicBoolean hasError = new AtomicBoolean(false);
+
+                    categoriesToDelete.forEach(category -> {
+                        pdfDataManager.removeAllPdfInCategory(category.getId(), result -> {
+                            if (result == PDFDataManager.PDFOperationResult.SUCCESS) {
+                                if (completedDeletions.incrementAndGet() == categoriesToDelete.size() && !hasError.get()) {
+                                    categoryViewModel.deleteCategories(categoriesToDelete);
+                                    Toast.makeText(this, "Selected categories and their PDFs deleted", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                }
+                            } else {
+                                hasError.set(true);
+                                Toast.makeText(this, "Error deleting category " + category.getName(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    });
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
 
 }
