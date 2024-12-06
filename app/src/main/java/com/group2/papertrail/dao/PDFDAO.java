@@ -38,7 +38,7 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     "user_id INTEGER NOT NULL, " +
                     "FOREIGN KEY(category_id) REFERENCES categories(id), " +
                     "FOREIGN KEY(user_id) REFERENCES users(id)" +
-                    "UNIQUE(id, uri)" +
+                    "UNIQUE(uri, category_id)" +
                     ");";
 
 

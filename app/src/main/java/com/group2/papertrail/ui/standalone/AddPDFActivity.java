@@ -1,6 +1,7 @@
 package com.group2.papertrail.ui.standalone;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -92,6 +93,10 @@ public class AddPDFActivity extends AppCompatActivity {
                                 break;
                             case EMPTY_FILE:
                                 binding.menu.setError("Category is required");
+                                break;
+                            case DUPLICATE:
+                                binding.fileName.setTextColor(Color.RED);
+                                Toast.makeText(this, "PDF already exists in " + this.addPDFActivityViewModel.getSelectedCategory().getValue().getName(), Toast.LENGTH_SHORT).show();
                                 break;
                         }
                         this.addPDFActivityViewModel.setIsLoading(false);

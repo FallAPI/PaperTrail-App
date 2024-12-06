@@ -38,7 +38,8 @@ public class PDFDataManager {
     public enum PDFOperationResult {
         SUCCESS,
         ERROR,
-        EMPTY_FILE
+        EMPTY_FILE,
+        DUPLICATE
     }
 
     public enum BooleanCallback {
@@ -120,7 +121,17 @@ public class PDFDataManager {
                         sharedPreferencesManager.getUserId()
                 );
 
-                pdfDAO.insert(newPdf);
+                var res = pdfDAO.insert(newPdf);
+
+                if (res == -1) {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        isDataChanged.setValue(false);
+                        setIsLoading(false);
+                        callback.onResult(PDFOperationResult.DUPLICATE);
+                    });
+                    return;
+                }
+
                 new Handler(Looper.getMainLooper()).post(() -> {
                     isDataChanged.setValue(true);
                     setIsLoading(false);
