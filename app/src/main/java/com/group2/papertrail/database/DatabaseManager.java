@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 public class DatabaseManager extends SQLiteOpenHelper {
     private static final String DB_NAME = "papertrail.db";
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 7;
     private static DatabaseManager instance;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
