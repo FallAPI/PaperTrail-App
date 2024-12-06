@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PDFDataManager {
     private static PDFDataManager instance;
@@ -38,6 +39,11 @@ public class PDFDataManager {
         SUCCESS,
         ERROR,
         EMPTY_FILE
+    }
+
+    public enum BooleanCallback {
+        TRUE,
+        FALSE
     }
 
     private PDFDataManager(Context context) {
@@ -130,28 +136,83 @@ public class PDFDataManager {
         });
     }
 
+    public void removeAllAPdfInCategory(Category category, Callback<PDFOperationResult> callback) {
+        removeAllPdfInCategory(category.getId(), callback);
+    }
+
+    public void removeAllPdfInCategory(long categoryId, Callback<PDFOperationResult> callback) {
+        try {
+            Executors.newSingleThreadExecutor().execute(() -> {
+                try {
+                    var pdfs = this.pdfDAO.findAllByCategoryId(categoryId, sharedPreferencesManager.getUserId());
+                    boolean allSuccessful = true;
+                    
+                    for (var pdf : pdfs) {
+                        final AtomicBoolean operationResult = new AtomicBoolean(true);
+                        removePDF(pdf, result -> {
+                            if (result == PDFOperationResult.ERROR) {
+                                operationResult.set(false);
+                            }
+                        });
+                        
+                        if (!operationResult.get()) {
+                            allSuccessful = false;
+                            break;
+                        }
+                    }
+
+                    final boolean success = allSuccessful;
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        callback.onResult(success ? PDFOperationResult.SUCCESS : PDFOperationResult.ERROR);
+                    });
+                } catch (Exception e) {
+                    Log.e("PDF_VM", "Error removing PDFs from category", e);
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        callback.onResult(PDFOperationResult.ERROR);
+                    });
+                }
+            });
+        } catch (Exception e) {
+            Log.e("PDF_VM", "Error starting executor", e);
+            callback.onResult(PDFOperationResult.ERROR);
+        }
+    }
+
+
     public void removePDF(PDF pdf, Callback<PDFOperationResult> callback) {
         try {
             Executors.newSingleThreadExecutor().execute(() -> {
-
-                var success = ThumbnailManager.deleteThumbnail(ctx, pdf.getThumbnailFilePath());
-                if (success) {
-                    int rowsAffected = pdfDAO.delete(pdf);
-                    if (rowsAffected > 0) {
-                        new Handler(Looper.getMainLooper()).post(() -> {
-                            setDataChanged(true);
-                            callback.onResult(PDFOperationResult.SUCCESS);
-                        });
+                try {
+                    var success = ThumbnailManager.deleteThumbnail(ctx, pdf.getThumbnailFilePath());
+                    if (success) {
+                        int rowsAffected = pdfDAO.delete(pdf);
+                        if (rowsAffected > 0) {
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                setDataChanged(true);
+                                callback.onResult(PDFOperationResult.SUCCESS);
+                            });
+                            return;
+                        }
                     }
-                } else {
-                    callback.onResult(PDFOperationResult.ERROR);
+                    // All error cases handled on main thread
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        callback.onResult(PDFOperationResult.ERROR);
+                    });
+                } catch (Exception e) {
+                    Log.e("PDF_VM", "Error removing PDF", e);
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        callback.onResult(PDFOperationResult.ERROR);
+                    });
                 }
             });
-            return;
         } catch (Exception e) {
             e.printStackTrace();
+            callback.onResult(PDFOperationResult.ERROR);
         }
-        callback.onResult(PDFOperationResult.ERROR);
+    }
+
+    public boolean checkCategoryHasChildPDFs(long categoryId) {
+        return this.pdfDAO.hasPDFsInCategory(categoryId, sharedPreferencesManager.getUserId());
     }
 
     public LiveData<Boolean> isDataChanged() {
