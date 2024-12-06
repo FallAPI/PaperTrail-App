@@ -88,7 +88,19 @@ public class HomeFragment extends Fragment {
                         .collect(Collectors.toList());
                     Collections.reverse(recentlyViewedPDFComponentList);
                     recentlyViewedAdapter.updateData(recentlyViewedPDFComponentList);
+
+                    if (recentlyViewedPDFComponentList.isEmpty()){
+                        binding.recentlyViewedEmptyMessage.setVisibility(View.VISIBLE);
+                        binding.reclyerViewRecentlyUsed.setVisibility(View.GONE);
+                    }else {
+                        binding.recentlyViewedEmptyMessage.setVisibility(View.GONE);
+                        binding.reclyerViewRecentlyUsed.setVisibility(View.VISIBLE);
+                    }
+
                 });
+            }else {
+                binding.recentlyViewedEmptyMessage.setVisibility(View.VISIBLE);
+                binding.reclyerViewRecentlyUsed.setVisibility(View.GONE);
             }
         });
 
@@ -99,6 +111,14 @@ public class HomeFragment extends Fragment {
                 .map(PDFComponent::new)
                 .collect(Collectors.toList());
             favoritesAdapter.updateData(favoritesPDFComponentList);
+
+            if (favoritesPDFComponentList.isEmpty()){
+                binding.favoritesEmptyMessage.setVisibility(View.VISIBLE);
+                binding.recyclerViewFavorites.setVisibility(View.GONE);
+            }else{
+                binding.favoritesEmptyMessage.setVisibility(View.GONE);
+                binding.recyclerViewFavorites.setVisibility(View.VISIBLE);
+            }
         });
     }
 

@@ -34,8 +34,6 @@ public class SplashActivity extends AppCompatActivity {
 
         handler.postDelayed(() -> {
             splashScreen.setKeepOnScreenCondition(() -> false);
-
-
             //check the userId if exist
             long userId = SharedPreferencesManager.getInstance(getApplicationContext()).getUserId();
             if (userId != -1){
