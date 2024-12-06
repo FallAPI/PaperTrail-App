@@ -7,6 +7,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.group2.papertrail.dao.CategoryDAO;
 import com.group2.papertrail.util.SharedPreferencesManager;
 import com.group2.papertrail.MainActivity;
 import com.group2.papertrail.dao.UserDAO;
@@ -59,12 +60,16 @@ public class LoginActivity extends AppCompatActivity {
             return; // Stop processing if there's an error
         }
         long userId = userDAO.loginUser(username, password);
-        if (userId != -1){
-            //save to shared preferences
+        if (userId != -1) {
+            // Add default categories for the user
+            var categoryDAO = new CategoryDAO(getApplicationContext());
+            categoryDAO.addDefaultCategories(userId);
+            
+            // Save to shared preferences
             SharedPreferencesManager.getInstance(getApplicationContext()).saveUserId(userId);
             Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
             navigateTo(MainActivity.class);
-        }else {
+        } else {
             Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
         }
     }

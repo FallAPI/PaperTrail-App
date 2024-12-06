@@ -43,7 +43,7 @@ public class DatabaseManager extends SQLiteOpenHelper {
         db.execSQL(UserDAO.CREATE_TABLE);
         
         // Add default categories when database is first created
-        addStaticValues(db);
+//        addStaticValues(db);
     }
 
     @Override

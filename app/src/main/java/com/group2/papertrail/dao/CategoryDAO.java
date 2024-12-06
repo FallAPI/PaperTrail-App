@@ -99,4 +99,26 @@ public class CategoryDAO implements BaseDAO<Category> {
         cursor.close();
         return categories;
     }
+
+    public void addDefaultCategories(long userId) {
+        SQLiteDatabase db = dbManager.getWritableDatabase();
+        try {
+            db.beginTransaction();
+            
+            // Add default categories for the user
+            ContentValues values = new ContentValues();
+            values.put("name", "Personal");
+            values.put("user_id", userId);
+            db.insert(TABLE_NAME, null, values);
+    
+            values.clear();
+            values.put("name", "School");
+            values.put("user_id", userId);
+            db.insert(TABLE_NAME, null, values);
+    
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
 }
