@@ -35,5 +35,33 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         return tabNames.size();
     }
 
+    public void updateTabs(List<Category> newTabsNames){
+        this.tabNames.clear();
+        this.tabNames.addAll(newTabsNames);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        // Use a unique identifier for each tab
+        if (position < tabNames.size() - 1) {
+            return tabNames.get(position).getId();
+        } else {
+            return -1;
+        }
+    }
+
+    @Override
+    public boolean containsItem(long itemId) {
+        // Check if the ID exists in the list
+        for (Category category : tabNames) {
+            if (category.getId() == itemId) {
+                return true;
+            }
+        }
+        return itemId == -1;
+    }
+
+
 
 }
