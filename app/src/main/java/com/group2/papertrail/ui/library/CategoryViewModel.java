@@ -30,7 +30,8 @@ public class CategoryViewModel extends ViewModel {
     public enum AddCategoryResult {
         SUCCESS,
         ERROR,
-        EMPTY_NAME
+        EMPTY_NAME,
+        DUPLICATE
     }
 
     public CategoryViewModel(Application app) {
@@ -89,7 +90,16 @@ public class CategoryViewModel extends ViewModel {
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
                 Category category = new Category(categoryName.trim(), sharedPreferencesManager.getUserId());
-                categoryDAO.insert(category);
+                var res = categoryDAO.insert(category);
+
+                if (res == -1) {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        setIsLoading(false);
+                        callback.onResult(AddCategoryResult.DUPLICATE);
+                    });
+                    return;
+                }
+
                 loadCategories(); // Reload categories after insertion
 
                 new Handler(Looper.getMainLooper()).post(() -> {

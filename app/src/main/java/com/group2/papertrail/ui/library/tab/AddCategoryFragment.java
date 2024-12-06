@@ -54,7 +54,9 @@ public class AddCategoryFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable editable) {}
+            public void afterTextChanged(Editable editable) {
+                binding.categoryTxtLayout.setError(null);
+            }
         });
 
         addCategoryViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
@@ -83,6 +85,9 @@ public class AddCategoryFragment extends Fragment {
                         break;
                     case EMPTY_NAME:
                         binding.categoryTxtLayout.setError("Category name cannot be empty");
+                        break;
+                    case DUPLICATE:
+                        binding.categoryTxtLayout.setError("Already exists");
                         break;
                 }
             });
