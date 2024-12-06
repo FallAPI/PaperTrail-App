@@ -3,10 +3,10 @@
     <item
         android:id="@+id/action_delete_tabs"
         android:icon="@drawable/ic_delete"
-        android:title="delete category" />
+        android:title="Delete category" />
 
     <item
         android:id="@+id/action_logout"
         android:icon="@drawable/ic_logout"
-        android:title="logout" />
+        android:title="Log out" />
 </menu>
