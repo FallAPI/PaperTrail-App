@@ -60,7 +60,7 @@ public class HomeFragment extends Fragment {
 
         // Set up RecyclerViews
         binding.recyclerViewFavorites.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        binding.reclyerViewRecentlyUsed.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, true));
+        binding.reclyerViewRecentlyUsed.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.recyclerViewFavorites.setAdapter(favoritesAdapter);
         binding.reclyerViewRecentlyUsed.setAdapter(recentlyViewedAdapter);
 
@@ -86,6 +86,7 @@ public class HomeFragment extends Fragment {
                         .filter(pdf -> pdfIds.contains(pdf.getId()))
                         .map(PDFComponent::new)
                         .collect(Collectors.toList());
+                    Collections.reverse(recentlyViewedPDFComponentList);
                     recentlyViewedAdapter.updateData(recentlyViewedPDFComponentList);
                 });
             }

@@ -37,7 +37,7 @@ public class SplashActivity extends AppCompatActivity {
 
 
             //check the userId if exist
-            long userId = SharedPreferencesManager.getInstance(this).getUserId();
+            long userId = SharedPreferencesManager.getInstance(getApplicationContext()).getUserId();
             if (userId != -1){
                 navigateTo(MainActivity.class);
             }else {
