@@ -24,7 +24,7 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     "file_name TEXT NOT NULL, " +
                     "description TEXT, " +
-                    "uri TEXT NOT NULL UNIQUE, " +
+                    "uri TEXT NOT NULL, " +
                     "thumbnail_file_path TEXT, " +
                     "is_favorite BOOLEAN DEFAULT 0, " +
                     "title TEXT, " +
@@ -38,6 +38,7 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     "user_id INTEGER NOT NULL, " +
                     "FOREIGN KEY(category_id) REFERENCES categories(id), " +
                     "FOREIGN KEY(user_id) REFERENCES users(id)" +
+                    "UNIQUE(id, uri)" +
                     ");";
 
 
@@ -242,5 +243,16 @@ public class PDFDAO implements  BaseDAO<PDF> {
         }
         cursor.close();
         return pdfs;
+    }
+
+    public boolean hasPDFsInCategory(long categoryId, long userId) {
+        SQLiteDatabase db = dbManager.getReadableDatabase();
+        var cursor = db.query(TABLE_NAME, null,
+                "category_id = ? AND user_id = ?", 
+                new String[]{String.valueOf(categoryId), String.valueOf(userId)},
+                null, null, null);
+        boolean hasPDFs = cursor.getCount() > 0;
+        cursor.close();
+        return hasPDFs;
     }
 }
