@@ -18,7 +18,9 @@ public class CategoryDAO implements BaseDAO<Category> {
     public static final String CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + "(" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name TEXT NOT NULL UNIQUE" +
+                    "name TEXT NOT NULL, " +
+                    "user_id INTEGER, " +
+                    "UNIQUE(name, user_id)" +
                     ");";
 
     private final DatabaseManager dbManager;
@@ -33,6 +35,7 @@ public class CategoryDAO implements BaseDAO<Category> {
         var db = dbManager.getWritableDatabase();
         var values = new ContentValues();
         values.put("name", category.getName());
+        values.put("user_id", category.getUserId());
 
         return db.insert(TABLE_NAME, null, values);
     }
@@ -42,15 +45,20 @@ public class CategoryDAO implements BaseDAO<Category> {
         var db = dbManager.getWritableDatabase();
         var values = new ContentValues();
         values.put("name", category.getName());
+        values.put("user_id", category.getUserId());
 
-        return db.update(TABLE_NAME, values, "id = ?", new String[]{String.valueOf(category.getId())});
+        return db.update(TABLE_NAME, values, 
+            "id = ? AND user_id = ?", 
+            new String[]{String.valueOf(category.getId()), String.valueOf(category.getUserId())});
     }
 
     @Override
     public int delete(Category category) {
         var db = dbManager.getWritableDatabase();
 
-        return db.delete(TABLE_NAME, "id = ?", new String[]{String.valueOf(category.getId())});
+        return db.delete(TABLE_NAME, 
+            "id = ? AND user_id = ?", 
+            new String[]{String.valueOf(category.getId()), String.valueOf(category.getUserId())});
     }
 
     @Override
@@ -64,7 +72,8 @@ public class CategoryDAO implements BaseDAO<Category> {
         if (cursor.moveToFirst()) {
             category = new Category(
                     cursor.getLong(cursor.getColumnIndexOrThrow("id")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                    cursor.getString(cursor.getColumnIndexOrThrow("name")),
+                    cursor.getLong(cursor.getColumnIndexOrThrow("user_id"))
             );
         }
         cursor.close();
@@ -72,16 +81,18 @@ public class CategoryDAO implements BaseDAO<Category> {
     }
 
     @Override
-    public List<Category> findAll() {
+    public List<Category> findAllByUserId(long userId) {
         var categories = new ArrayList<Category>();
         var db = dbManager.getReadableDatabase();
         var cursor = db.query(TABLE_NAME, null,
-                null, null, null, null, null);
+                "user_id = ? OR user_id IS NULL", new String[]{String.valueOf(userId)},
+                null, null, null);
 
         while (cursor.moveToNext()) {
             var category = new Category(
                     cursor.getLong(cursor.getColumnIndexOrThrow("id")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                    cursor.getString(cursor.getColumnIndexOrThrow("name")),
+                    cursor.getLong(cursor.getColumnIndexOrThrow("user_id"))
             );
             categories.add(category);
         }
