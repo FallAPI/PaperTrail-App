@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.group2.papertrail.R;
 import com.group2.papertrail.databinding.ActivityEditPdfactivityBinding;
+import com.group2.papertrail.model.Category;
 import com.group2.papertrail.model.PDF;
 import com.group2.papertrail.ui.PDFDataManager;
 
@@ -58,7 +59,9 @@ public class EditPDFActivity extends AppCompatActivity {
         });
 
         binding.dropdownMenu.setOnItemClickListener((adapterView, view, i, l) -> {
-            editPDFViewModel.selectCategoryById(i+1);
+            var category = (Category) adapterView.getAdapter().getItem(i);
+            editPDFViewModel.setSelectedCategory(category);
+
         });
 
         editPDFViewModel.getIsLoading().observe(this, isLoading -> {
