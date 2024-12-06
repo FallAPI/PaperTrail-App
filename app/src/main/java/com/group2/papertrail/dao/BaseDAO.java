@@ -7,5 +7,5 @@ public interface BaseDAO<T> {
     int update(T model);
     int delete(T model);
     T findById(long id);
-    List<T> findAll();
+    List<T> findAllByUserId(long userId);
 }

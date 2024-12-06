@@ -35,7 +35,9 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     "is_original_date BOOLEAN DEFAULT 1, " +
                     "updated_at INTEGER, " +
                     "category_id INTEGER NOT NULL, " +
-                    "FOREIGN KEY(category_id) REFERENCES categories(id)" +
+                    "user_id INTEGER NOT NULL, " +
+                    "FOREIGN KEY(category_id) REFERENCES categories(id), " +
+                    "FOREIGN KEY(user_id) REFERENCES users(id)" +
                     ");";
 
 
@@ -65,6 +67,7 @@ public class PDFDAO implements  BaseDAO<PDF> {
         }
 
         values.put("category_id", model.getCategory().getId());
+        values.put("user_id", model.getUserId());
         return db.insert(TABLE_NAME, null, values);
     }
 
@@ -84,21 +87,28 @@ public class PDFDAO implements  BaseDAO<PDF> {
         values.put("created_at", model.getCreatedAt().getTime());
         values.put("updated_at", new Date().getTime());
         values.put("category_id", model.getCategory().getId());
-        return db.update(TABLE_NAME, values, "id = ?", new String[]{String.valueOf(model.getId())});
+        values.put("user_id", model.getUserId());
+        return db.update(TABLE_NAME, values, "id = ? AND user_id = ?", 
+            new String[]{String.valueOf(model.getId()), String.valueOf(model.getUserId())});
     }
 
     @Override
     public int delete(PDF model) {
         var db = dbManager.getWritableDatabase();
-
-        return db.delete(TABLE_NAME, "id = ?", new String[]{String.valueOf(model.getId())});
+        return db.delete(TABLE_NAME, "id = ? AND user_id = ?", 
+            new String[]{String.valueOf(model.getId()), String.valueOf(model.getUserId())});
     }
 
     @Override
     public PDF findById(long id) {
+        return null;
+    }
+
+
+    public PDF findById(long id, long userId) {
         SQLiteDatabase db = dbManager.getReadableDatabase();
         var cursor = db.query(TABLE_NAME, null,
-                "id = ?", new String[]{String.valueOf(id)},
+                "id = ? AND user_id = ?", new String[]{String.valueOf(id), String.valueOf(userId)},
                 null, null, null);
 
         PDF pdf = null;
@@ -117,18 +127,20 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("created_at"))),
                     new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("updated_at"))),
                     categoryDAO.findById(cursor.getInt(cursor.getColumnIndexOrThrow("category_id"))),
-                    cursor.getInt(cursor.getColumnIndexOrThrow("is_original_date")) == 1
+                    cursor.getInt(cursor.getColumnIndexOrThrow("is_original_date")) == 1,
+                    cursor.getLong(cursor.getColumnIndexOrThrow("user_id"))
             );
         }
         cursor.close();
         return pdf;
     }
 
-    public List<PDF> findAllByCategoryId(long categoryId) {
+    public List<PDF> findAllByCategoryId(long categoryId, long userId) {
         var pdfs = new ArrayList<PDF>();
         var db = dbManager.getReadableDatabase();
         var cursor = db.query(TABLE_NAME, null,
-                "category_id = ?", new String[]{String.valueOf(categoryId)},
+                "category_id = ? AND user_id = ?", 
+                new String[]{String.valueOf(categoryId), String.valueOf(userId)},
                 null, null, null);
 
         while (cursor.moveToNext()) {
@@ -146,7 +158,8 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("created_at"))),
                     new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("updated_at"))),
                     categoryDAO.findById(cursor.getInt(cursor.getColumnIndexOrThrow("category_id"))),
-                    cursor.getInt(cursor.getColumnIndexOrThrow("is_original_date")) == 1
+                    cursor.getInt(cursor.getColumnIndexOrThrow("is_original_date")) == 1,
+                    cursor.getLong(cursor.getColumnIndexOrThrow("user_id"))
             );
 
             pdfs.add(pdf);
@@ -155,20 +168,22 @@ public class PDFDAO implements  BaseDAO<PDF> {
         return pdfs;
     }
 
-    public List<PDF> findAllByRangeId(Long[] ids) {
+    public List<PDF> findAllByRangeId(Long[] ids, long userId) {
         var pdfs = new ArrayList<PDF>();
         var db = dbManager.getReadableDatabase();
 
         // Create a string with placeholders for each id
         String placeholders = String.join(",", Collections.nCopies(ids.length, "?"));
-        String selection = "id IN (" + placeholders + ")";
-
-        // Convert Long[] to String[]
+        String selection = "id IN (" + placeholders + ") AND user_id = ?";
+        
+        // Add userId to selection args
         String[] selectionArgs = Arrays.stream(ids)
                 .map(String::valueOf)
                 .toArray(String[]::new);
-
-        var cursor = db.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
+        String[] finalArgs = Arrays.copyOf(selectionArgs, selectionArgs.length + 1);
+        finalArgs[finalArgs.length - 1] = String.valueOf(userId);
+        
+        var cursor = db.query(TABLE_NAME, null, selection, finalArgs, null, null, null);
 
         while (cursor.moveToNext()) {
             var pdf = new PDF(
@@ -185,7 +200,8 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("created_at"))),
                     new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("updated_at"))),
                     categoryDAO.findById(cursor.getInt(cursor.getColumnIndexOrThrow("category_id"))),
-                    cursor.getInt(cursor.getColumnIndexOrThrow("is_original_date")) == 1
+                    cursor.getInt(cursor.getColumnIndexOrThrow("is_original_date")) == 1,
+                    cursor.getLong(cursor.getColumnIndexOrThrow("user_id"))
             );
 
             pdfs.add(pdf);
@@ -194,12 +210,14 @@ public class PDFDAO implements  BaseDAO<PDF> {
         return pdfs;
     }
 
+
     @Override
-    public List<PDF> findAll() {
+    public List<PDF> findAllByUserId(long userId) {
         var pdfs = new ArrayList<PDF>();
         var db = dbManager.getReadableDatabase();
         var cursor = db.query(TABLE_NAME, null,
-                null, null, null, null, null);
+                "user_id = ?", new String[]{String.valueOf(userId)},
+                null, null, null);
 
         while (cursor.moveToNext()) {
             var pdf = new PDF(
@@ -216,7 +234,8 @@ public class PDFDAO implements  BaseDAO<PDF> {
                     new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("created_at"))),
                     new Date((long) cursor.getLong(cursor.getColumnIndexOrThrow("updated_at"))),
                     categoryDAO.findById(cursor.getInt(cursor.getColumnIndexOrThrow("category_id"))),
-                    cursor.getInt(cursor.getColumnIndexOrThrow("is_original_date")) == 1
+                    cursor.getInt(cursor.getColumnIndexOrThrow("is_original_date")) == 1,
+                    cursor.getLong(cursor.getColumnIndexOrThrow("user_id"))
             );
 
             pdfs.add(pdf);

@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel;
 import com.group2.papertrail.dao.CategoryDAO;
 import com.group2.papertrail.model.Category;
 import com.group2.papertrail.ui.library.tab.AddCategoryViewModel;
+import com.group2.papertrail.util.SharedPreferencesManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,17 +23,18 @@ public class LibraryViewModel extends ViewModel {
 
     private final MutableLiveData<List<Category>> categoryTabs;
     private final CategoryDAO categoryDAO;
-
+    private SharedPreferencesManager sharedPreferencesManager;
 
     public LibraryViewModel(Application app) {
         // Retrieve categories from sqlite
         this.categoryTabs = new MutableLiveData<>(new ArrayList<Category>());
         this.categoryDAO = new CategoryDAO(app.getApplicationContext());
+        this.sharedPreferencesManager = SharedPreferencesManager.getInstance(app.getApplicationContext());
 
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
                 // Ensure callback is called on main thread
-                List<Category> categories = this.categoryDAO.findAll();
+                List<Category> categories = this.categoryDAO.findAllByUserId(sharedPreferencesManager.getUserId());
                 new Handler(Looper.getMainLooper()).post(() -> {
                     this.categoryTabs.setValue(categories);
                 });
@@ -58,7 +60,7 @@ public class LibraryViewModel extends ViewModel {
             tabList = new ArrayList<>(tabList);
         }
 
-        var newTab = new Category(tabName);
+        var newTab = new Category(tabName, sharedPreferencesManager.getUserId());
 
         tabList.add(newTab);
         this.categoryTabs.setValue(tabList);

@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         long userId = userDAO.loginUser(username, password);
         if (userId != -1){
             //save to shared preferences
-            SharedPreferencesManager.getInstance(this).saveUserId(userId);
+            SharedPreferencesManager.getInstance(getApplicationContext()).saveUserId(userId);
             Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
             navigateTo(MainActivity.class);
         }else {

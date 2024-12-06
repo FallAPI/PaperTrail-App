@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModel;
 import com.group2.papertrail.dao.CategoryDAO;
 import com.group2.papertrail.model.Category;
 import com.group2.papertrail.util.Callback;
+import com.group2.papertrail.util.SharedPreferencesManager;
+
 import java.util.List;
 import java.util.concurrent.Executors;
 
@@ -17,6 +19,7 @@ public class CategoryViewModel extends ViewModel {
     private final MutableLiveData<List<Category>> categories = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> isUpdated = new MutableLiveData<>(false);
+    private SharedPreferencesManager sharedPreferencesManager;
     private final CategoryDAO categoryDAO;
 
     public enum AddCategoryResult {
@@ -27,6 +30,7 @@ public class CategoryViewModel extends ViewModel {
 
     public CategoryViewModel(Application app) {
         this.categoryDAO = new CategoryDAO(app.getApplicationContext());
+        this.sharedPreferencesManager = SharedPreferencesManager.getInstance(app.getApplicationContext());
         loadCategories();
     }
 
@@ -34,9 +38,9 @@ public class CategoryViewModel extends ViewModel {
         setIsLoading(true);
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
-                List<Category> categoryList = categoryDAO.findAll();
+                List<Category> categoryList = categoryDAO.findAllByUserId(sharedPreferencesManager.getUserId());
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    categoryList.add(new Category("Add")); // DO NOT REMOVE
+                    categoryList.add(new Category("Add", 0)); // DO NOT REMOVE
                     categories.setValue(categoryList);
                     setIsLoading(false);
                     setIsUpdated(true);
@@ -59,7 +63,7 @@ public class CategoryViewModel extends ViewModel {
         setIsLoading(true);
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
-                Category category = new Category(categoryName.trim());
+                Category category = new Category(categoryName.trim(), sharedPreferencesManager.getUserId());
                 categoryDAO.insert(category);
                 loadCategories(); // Reload categories after insertion
 

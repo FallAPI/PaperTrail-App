@@ -8,14 +8,17 @@ import androidx.annotation.NonNull;
 public class Category implements Parcelable {
     private long id;
     private String name;
+    private long userId;
 
-    public Category(String name) {
+    public Category(String name, long userId) {
         this.name = name;
+        this.userId = userId;
     }
 
-    public Category(long id, String name) {
+    public Category(long id, String name, long userId) {
         this.id = id;
         this.name = name;
+        this.userId = userId;
     }
 
     public long getId() {
@@ -34,6 +37,14 @@ public class Category implements Parcelable {
         this.name = name;
     }
 
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -43,12 +54,14 @@ public class Category implements Parcelable {
     protected Category(Parcel in) {
         id = in.readLong();
         name = in.readString();
+        userId = in.readLong();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
         dest.writeString(name);
+        dest.writeLong(userId);
     }
 
     @Override

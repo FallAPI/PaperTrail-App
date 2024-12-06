@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel;
 import com.group2.papertrail.dao.CategoryDAO;
 import com.group2.papertrail.model.Category;
 import com.group2.papertrail.util.FilePicker.FileMetadata;
+import com.group2.papertrail.util.SharedPreferencesManager;
 
 
 import java.util.ArrayList;
@@ -24,12 +25,14 @@ public class AddPDFActivityViewModel extends ViewModel {
     private MutableLiveData<List<Category>> categories;
     private MutableLiveData<Category> selectedCategory;
     private MutableLiveData<Boolean> isLoading;
+    private SharedPreferencesManager sharedPreferencesManager;
     public AddPDFActivityViewModel(Application app) {
         this.fileMetadata = new MutableLiveData<>();
         this.categoryDAO = new CategoryDAO(app.getApplicationContext());
         this.selectedCategory = new MutableLiveData<>();
         this.categories = new MutableLiveData<>(new ArrayList<>());
         this.isLoading = new MutableLiveData<>(false);
+        this.sharedPreferencesManager = SharedPreferencesManager.getInstance(app.getApplicationContext());
         loadCategories();
     }
 
@@ -52,7 +55,7 @@ public class AddPDFActivityViewModel extends ViewModel {
     public void loadCategories() {
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
-                List<Category> categoryList = categoryDAO.findAll();
+                List<Category> categoryList = categoryDAO.findAllByUserId(sharedPreferencesManager.getUserId());
                 new Handler(Looper.getMainLooper()).post(() -> {
                     this.categories.setValue(categoryList);
                 });

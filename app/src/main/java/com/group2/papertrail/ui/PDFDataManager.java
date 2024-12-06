@@ -15,6 +15,7 @@ import com.group2.papertrail.model.PDF;
 import com.group2.papertrail.util.Callback;
 import com.group2.papertrail.util.FilePicker;
 import com.group2.papertrail.util.PDFManager;
+import com.group2.papertrail.util.SharedPreferencesManager;
 import com.group2.papertrail.util.ThumbnailManager;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class PDFDataManager {
 
     private final MutableLiveData<Boolean> isDataChanged = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
+    private SharedPreferencesManager sharedPreferencesManager;
     private final Context ctx;
 
     private PDFDAO pdfDAO;
@@ -42,6 +44,7 @@ public class PDFDataManager {
         this.pdfFiles = new MutableLiveData<>(new ArrayList<PDF>());
         this.ctx = context.getApplicationContext();
         this.pdfDAO = new PDFDAO(this.ctx);
+        this.sharedPreferencesManager = SharedPreferencesManager.getInstance(context.getApplicationContext());
     }
 
     public static synchronized PDFDataManager getInstance(Context context) {
@@ -63,51 +66,11 @@ public class PDFDataManager {
         this.isLoading.setValue(state);
     }
 
-    public void loadPDF(Long[] ids, Callback<PDFOperationResult> callback) {
-        setIsLoading(true);
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                List<PDF> pdfs = pdfDAO.findAllByRangeId(ids);
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    pdfFiles.setValue(pdfs);
-                    setIsLoading(false);
-                    callback.onResult(PDFOperationResult.SUCCESS);
-                });
-            } catch (Exception e) {
-                Log.e("PDF_VM", "Error loading pdf", e);
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    setIsLoading(false);
-                    callback.onResult(PDFOperationResult.ERROR);
-                });
-            }
-        });
-    }
-
-    public void loadPDF(long categoryId, Callback<PDFOperationResult> callback) {
-        setIsLoading(true);
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                List<PDF> pdfs = pdfDAO.findAllByCategoryId(categoryId);
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    pdfFiles.setValue(pdfs);
-                    setIsLoading(false);
-                    callback.onResult(PDFOperationResult.SUCCESS);
-                });
-            } catch (Exception e) {
-                Log.e("PDF_VM", "Error loading pdf", e);
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    setIsLoading(false);
-                    callback.onResult(PDFOperationResult.ERROR);
-                });
-            }
-        });
-    }
-
     public void loadPDF(Callback<PDFOperationResult> callback) {
         setIsLoading(true);
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
-                List<PDF> pdfs = pdfDAO.findAll();
+                List<PDF> pdfs = pdfDAO.findAllByUserId(sharedPreferencesManager.getUserId());
                 new Handler(Looper.getMainLooper()).post(() -> {
                     pdfFiles.setValue(pdfs);
                     setIsLoading(false);
@@ -147,7 +110,8 @@ public class PDFDataManager {
                         pdfMetadata.getPageCount(),
                         pdfMetadata.getCreationDate() != null ? pdfMetadata.getCreationDate() : new Date(),
                         category,
-                        pdfMetadata.getCreationDate() != null
+                        pdfMetadata.getCreationDate() != null,
+                        sharedPreferencesManager.getUserId()
                 );
 
                 pdfDAO.insert(newPdf);

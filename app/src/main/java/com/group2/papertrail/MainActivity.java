@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logout(){
-        SharedPreferencesManager.getInstance(this).clearAllPreferences();
+        SharedPreferencesManager.getInstance(getApplicationContext()).saveUserId(0);
 
         Intent intent = new Intent(this, LoginActivity.class);
 
