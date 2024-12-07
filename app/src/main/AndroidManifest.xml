@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -22,7 +25,18 @@
             android:exported="false" />
         <activity
             android:name=".ui.standalone.AddPDFActivity"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter android:label="Import PDF">
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <!-- For handling PDF files -->
+<!--                <data android:mimeType="application/pdf" android:scheme="content" />-->
+<!--                <data android:mimeType="application/pdf" android:scheme="file" />-->
+                <data android:mimeType="*/*" />
+
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.splash.SplashActivity"
             android:exported="true"

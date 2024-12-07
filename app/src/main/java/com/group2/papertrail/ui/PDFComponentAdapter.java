@@ -26,6 +26,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.group2.papertrail.R;
 import com.group2.papertrail.dao.PDFDAO;
 import com.group2.papertrail.model.PDF;
@@ -166,7 +167,7 @@ public class PDFComponentAdapter extends RecyclerView.Adapter<PDFComponentAdapte
                 view.getContext().startActivity(intent);
             } else if (menuItem.getItemId() == R.id.action_remove) {
                 // Handle "Remove" action
-                new AlertDialog.Builder(view.getContext())
+                new MaterialAlertDialogBuilder(view.getContext())
                         .setTitle("Remove PDF")
                         .setMessage("Are you sure you want to remove this PDF?")
                         .setPositiveButton("Yes", (dialog, which) -> {

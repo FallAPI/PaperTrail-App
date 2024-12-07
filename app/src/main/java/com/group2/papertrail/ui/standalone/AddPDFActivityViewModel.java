@@ -23,6 +23,7 @@ public class AddPDFActivityViewModel extends ViewModel {
     private MutableLiveData<FileMetadata> fileMetadata;
     private CategoryDAO categoryDAO;
     private MutableLiveData<List<Category>> categories;
+    private boolean hasFileContent = false;
     private MutableLiveData<Category> selectedCategory;
     private MutableLiveData<Boolean> isLoading;
     private SharedPreferencesManager sharedPreferencesManager;
@@ -88,5 +89,13 @@ public class AddPDFActivityViewModel extends ViewModel {
 
     public void setIsLoading(boolean state) {
         this.isLoading.setValue(state);
+    }
+
+    public boolean hasFileContent() {
+        return hasFileContent;
+    }
+
+    public void setHasFileContent(boolean hasFileContent) {
+        this.hasFileContent = hasFileContent;
     }
 }

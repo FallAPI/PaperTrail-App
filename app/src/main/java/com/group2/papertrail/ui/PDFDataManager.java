@@ -1,8 +1,11 @@
 package com.group2.papertrail.ui;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.OpenableColumns;
 import android.telecom.Call;
 import android.util.Log;
 
@@ -18,6 +21,8 @@ import com.group2.papertrail.util.PDFManager;
 import com.group2.papertrail.util.SharedPreferencesManager;
 import com.group2.papertrail.util.ThumbnailManager;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,7 +99,46 @@ public class PDFDataManager {
         });
     }
 
-    public void addPDF(FilePicker.FileMetadata metadata, Category category, Callback<PDFOperationResult> callback) {
+    private String savePdfLocally(Uri pdfUri) {
+        try {
+            Cursor cursor = ctx.getContentResolver().query(pdfUri, null, null, null, null);
+            String fileName = "shared_file.pdf"; // Default name
+            if (cursor != null && cursor.moveToFirst()) {
+                int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (nameIndex >= 0) {
+                    fileName = cursor.getString(nameIndex);
+                }
+                cursor.close();
+            }
+
+            // Save the file to local storage
+            var outputDir = new File(ctx.getFilesDir(), "shared_pdfs");
+            if (!outputDir.exists()) {
+                outputDir.mkdirs();
+            }
+
+            File outputFile = new File(outputDir, fileName);
+            var inputStream = ctx.getContentResolver().openInputStream(pdfUri);
+            var outputStream = new FileOutputStream(outputFile);
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            inputStream.close();
+            outputStream.close();
+
+            return outputFile.getAbsolutePath();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public void addPDF(FilePicker.FileMetadata metadata, Category category, boolean hasFileContent, Callback<PDFOperationResult> callback) {
         if (metadata == null || category == null) {
             callback.onResult(PDFOperationResult.EMPTY_FILE);
             return;
@@ -103,13 +147,24 @@ public class PDFDataManager {
         setIsLoading(true);
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
+
+                String sharedPdfUri = null;
+                if(hasFileContent) {
+                    sharedPdfUri = savePdfLocally(metadata.getFileUri());
+                }
+
+                if(hasFileContent && sharedPdfUri == null) {
+                    callback.onResult(PDFOperationResult.ERROR);
+                    return;
+                }
+
                 var thumbnailBitmap = ThumbnailManager.generateThumbnailFromURI(this.ctx, metadata.getFileUri());
                 var thumbnailURI = ThumbnailManager.saveThumbnailToStorage(this.ctx, thumbnailBitmap);
                 var pdfMetadata = PDFManager.readPDFMetadata(this.ctx, metadata.getFileUri());
 
                 var newPdf = new PDF(
                         metadata.getFileName(),
-                        metadata.getFileUri().toString(),
+                        sharedPdfUri == null ? metadata.getFileUri().toString() : sharedPdfUri,
                         thumbnailURI,
                         pdfMetadata.getTitle(),
                         pdfMetadata.getAuthor(),
@@ -195,6 +250,14 @@ public class PDFDataManager {
             Executors.newSingleThreadExecutor().execute(() -> {
                 try {
                     var success = ThumbnailManager.deleteThumbnail(ctx, pdf.getThumbnailFilePath());
+
+                    if (pdf.getURI().contains("shared_pdfs")) {
+                        File file = new File(pdf.getURI());
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                    }
+
                     if (success) {
                         int rowsAffected = pdfDAO.delete(pdf);
                         if (rowsAffected > 0) {
