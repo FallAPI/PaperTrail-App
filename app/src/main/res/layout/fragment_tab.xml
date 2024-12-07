@@ -5,6 +5,7 @@
     android:id="@+id/parentTabFragment"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/design_default_color_surface"
     tools:context=".ui.library.tab.TabFragment">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
