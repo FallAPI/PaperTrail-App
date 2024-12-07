@@ -20,4 +20,8 @@
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
         <item name="postSplashScreenTheme">@style/Theme.PaperTrail</item>
     </style>
+
+    <style name="Base.Theme.PaperTrail" parent="Theme.Material3.Light.NoActionBar">
+
+    </style>
 </resources>
