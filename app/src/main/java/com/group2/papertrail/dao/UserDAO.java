@@ -69,7 +69,49 @@
         }
 
 
+        public User findByUsername(String username) {
+            SQLiteDatabase db = dbManager.getReadableDatabase();
+            String[] projection = {"userId", "username", "email", "password"};
+            String selection = "username = ?";
+            String[] selectionArgs = {username};
 
+            Cursor cursor = db.query(TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    User user = new User();
+                    user.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow("userId")));
+                    user.setUsername(cursor.getString(cursor.getColumnIndexOrThrow("username")));
+                    user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow("email")));
+                    user.setPassword(cursor.getString(cursor.getColumnIndexOrThrow("password")));
+                    return user;
+                }
+                return null;
+            } finally {
+                cursor.close();
+            }
+        }
+
+        public User findByEmail(String email) {
+            SQLiteDatabase db = dbManager.getReadableDatabase();
+            String[] projection = {"userId", "username", "email", "password"};
+            String selection = "email = ?";
+            String[] selectionArgs = {email};
+
+            Cursor cursor = db.query(TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    User user = new User();
+                    user.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow("userId")));
+                    user.setUsername(cursor.getString(cursor.getColumnIndexOrThrow("username")));
+                    user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow("email")));
+                    user.setPassword(cursor.getString(cursor.getColumnIndexOrThrow("password")));
+                    return user;
+                }
+                return null;
+            } finally {
+                cursor.close();
+            }
+        }
 
         @Override
         public int update(User model) {

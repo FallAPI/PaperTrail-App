@@ -60,17 +60,20 @@ public class LoginActivity extends AppCompatActivity {
             return; // Stop processing if there's an error
         }
         long userId = userDAO.loginUser(username, password);
-        if (userId != -1) {
+
+        if (userId == -1) {
+            binding.TextInputUsername.setError("Invalid credentials");
+            binding.TextInputPassword.setError("Invalid credentials");
+            Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+        } else {
             // Add default categories for the user
             var categoryDAO = new CategoryDAO(getApplicationContext());
             categoryDAO.addDefaultCategories(userId);
-            
+
             // Save to shared preferences
             SharedPreferencesManager.getInstance(getApplicationContext()).saveUserId(userId);
             Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
             navigateTo(MainActivity.class);
-        } else {
-            Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
         }
     }
 
